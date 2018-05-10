@@ -17,47 +17,75 @@ using REMME.Auth.Client.RemmeApi;
 using Org.BouncyCastle.Crypto.Operators;
 using Org.BouncyCastle.Crypto.Prng;
 using Org.BouncyCastle.Utilities.IO.Pem;
+using Org.BouncyCastle.X509;
+using System.Security.Cryptography;
+using SystemX509 = System.Security.Cryptography.X509Certificates;
+using Org.BouncyCastle.Asn1.Pkcs;
 
 namespace REMME.Auth.Client
 {
     public class RemmeClient : IRemmeClient
     {
-        public async Task CreateCertificate()
+        private readonly RemmeRest _remmeRest;
+        private const int _rsaKeySize = 4096;
+
+        public RemmeClient(string nodeAddress = "localhost:8080")
         {
-            var pair = GenerateKeyPair();
-            var subject = CreateFakeSubject();
+            _remmeRest = new RemmeRest(nodeAddress);
+        }
+
+        public async Task<SystemX509.X509Certificate2> CreateCertificate(string comonName, string email)
+        {
+            var subject = CreateSubject(comonName, email);
+            var pair = GetKeyPairWithDotNet();
+            var keyParams = (RsaPrivateCrtKeyParameters)pair.Private;
+            var rsaPrivateKey = DotNetUtilities.ToRSA(keyParams);
+
             var pkcs10CertificationRequest = CreateSignRequest(subject, pair);
 
-            await StoreCertificate(pkcs10CertificationRequest);
-            var pkInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(pair.Private);
-            var privateKey = Convert.ToBase64String(pkInfo.GetDerEncoded());
+            var cert = await StoreCertificate(pkcs10CertificationRequest);
+            cert.PrivateKey = rsaPrivateKey;
+            return cert;
         }
 
-        public async Task StoreCertificate(Pkcs10CertificationRequest signingRequest)
+        public async Task<SystemX509.X509Certificate2> StoreCertificate(Pkcs10CertificationRequest signingRequest)
         {
-            string url = "http://192.168.99.101:8080/api/v1/certificate/store";
             var payload = new CertificateRequestPayload(signingRequest);
-            var result = await new RemmeRest().PutRequest<CertificateRequestPayload, CertificateResult>(url, payload);
+            var result = await _remmeRest
+                .PutRequest<CertificateRequestPayload, CertificateResult>(
+                            payload,
+                            RemmeMethodsEnum.CertificateStore);
+
+            return GetCertificateFromResponse(result.CertificatePEM);
         }
 
-        public Pkcs10CertificationRequest CreateSignRequest(X509Name subject, AsymmetricCipherKeyPair keyPair)
+        public async Task<bool> CheckCertificate(SystemX509.X509Certificate2 certificate)
+        {
+            var payload = new CertificateCheckPayload(certificate);
+
+            var result = await _remmeRest
+                .PostRequest<CertificateCheckPayload, CertificateCheckResult>(
+                            payload,
+                            RemmeMethodsEnum.Certificate);
+
+            return result.IsRevoked;
+        }
+
+        private Pkcs10CertificationRequest CreateSignRequest(X509Name subject, AsymmetricCipherKeyPair keyPair)
         {
             var randomGenerator = new CryptoApiRandomGenerator();
             var random = new SecureRandom(randomGenerator);
             var signatureFactory = new Asn1SignatureFactory("SHA512WITHRSA", keyPair.Private, random);
-
-            System.Security.Cryptography.X509Certificates.X509Certificate2 certificate = pem.ReadCertificateFromFile("certificate.cer");
-            
             return new Pkcs10CertificationRequest(signatureFactory, subject, keyPair.Public, null, keyPair.Private);
         }
 
-        private X509Name CreateFakeSubject()
+        private X509Name CreateSubject(string comonName, string email)
         {
             var attributes = new Dictionary<DerObjectIdentifier, string>
             {
-                { X509Name.CN, "tolik" },
+                { X509Name.CN, comonName },
+                { X509Name.EmailAddress, email }
             };
-            attributes.Add(X509Name.EmailAddress, "tolik@tolik.tolik");
             return new X509Name(attributes.Keys.ToList(), attributes);
         }
 
@@ -70,5 +98,23 @@ namespace REMME.Auth.Client
             rsaKeyPairGenerator.Init(genParam);
             return rsaKeyPairGenerator.GenerateKeyPair();
         }
+
+        public static AsymmetricCipherKeyPair GetKeyPairWithDotNet()
+        {
+            using (RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider(_rsaKeySize))
+            {
+                RSAParameters rsaKeyInfo = rsaProvider.ExportParameters(true);
+                return DotNetUtilities.GetRsaKeyPair(rsaKeyInfo);
+            }
+        }
+
+        private SystemX509.X509Certificate2 GetCertificateFromResponse(string pemCertificate)
+        {
+            var pemString = pemCertificate
+                .Replace("-----BEGIN CERTIFICATE-----", "")
+                .Replace("-----END CERTIFICATE-----", "");
+            return new SystemX509.X509Certificate2(Convert.FromBase64String(pemString));
+        }
+
     }
 }

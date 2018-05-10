@@ -48,8 +48,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contracts\Models\CertificateCheckPayload.cs" />
+    <Compile Include="Contracts\Models\CertificateCheckResult.cs" />
     <Compile Include="Contracts\Models\CertificateRequestPayload.cs" />
     <Compile Include="Contracts\Models\CertificateResult.cs" />
+    <Compile Include="RemmeApi\RemmeMethodsEnum.cs" />
     <Compile Include="RemmeApi\RemmeRest.cs" />
     <Compile Include="RemmeClient.cs" />
     <Compile Include="Contracts\IRemmeClient.cs" />
