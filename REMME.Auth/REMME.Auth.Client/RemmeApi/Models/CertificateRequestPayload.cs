@@ -2,7 +2,7 @@
 using Org.BouncyCastle.Pkcs;
 using System;
 
-namespace REMME.Auth.Client.Contracts.Models
+namespace REMME.Auth.Client.RemmeApi.Models
 {
     public class CertificateRequestPayload
     {

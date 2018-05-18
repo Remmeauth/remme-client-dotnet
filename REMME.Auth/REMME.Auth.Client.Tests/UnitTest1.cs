@@ -11,7 +11,7 @@ namespace REMME.Auth.Client.Tests
         {
             try
             {
-                new RemmeClient().CreateCertificate();
+                //new RemmeClient().CreateCertificate();
             }
             catch(Exception ex)
             {

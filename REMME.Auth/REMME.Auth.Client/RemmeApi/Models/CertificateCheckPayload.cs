@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 
-namespace REMME.Auth.Client.Contracts.Models
+namespace REMME.Auth.Client.RemmeApi.Models
 {
     public class CertificateCheckPayload
     {

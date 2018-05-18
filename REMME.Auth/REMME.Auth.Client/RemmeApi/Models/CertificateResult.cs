@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace REMME.Auth.Client.Contracts.Models
+namespace REMME.Auth.Client.RemmeApi.Models
 {
     public class CertificateResult
     {

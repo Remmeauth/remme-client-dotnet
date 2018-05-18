@@ -21,6 +21,7 @@ using Org.BouncyCastle.X509;
 using System.Security.Cryptography;
 using SystemX509 = System.Security.Cryptography.X509Certificates;
 using Org.BouncyCastle.Asn1.Pkcs;
+using REMME.Auth.Client.RemmeApi.Models;
 
 namespace REMME.Auth.Client
 {
@@ -28,13 +29,15 @@ namespace REMME.Auth.Client
     {
         private readonly RemmeRest _remmeRest;
         private const int _rsaKeySize = 4096;
+        private readonly string _nodeAddress;
 
         public RemmeClient(string nodeAddress = "localhost:8080")
         {
-            _remmeRest = new RemmeRest(nodeAddress);
+            _nodeAddress = nodeAddress;
+            _remmeRest = new RemmeRest(_nodeAddress);
         }
 
-        public async Task<SystemX509.X509Certificate2> CreateCertificate(string comonName, string email)
+        public async Task<CertificateTransactionResponse> CreateCertificate(string comonName, string email)
         {
             var subject = CreateSubject(comonName, email);
             var pair = GetKeyPairWithDotNet();
@@ -43,20 +46,25 @@ namespace REMME.Auth.Client
 
             var pkcs10CertificationRequest = CreateSignRequest(subject, pair);
 
-            var cert = await StoreCertificate(pkcs10CertificationRequest);
-            cert.PrivateKey = rsaPrivateKey;
-            return cert;
+            var certResponse = await StoreCertificate(pkcs10CertificationRequest);
+            certResponse.Certificate.PrivateKey = rsaPrivateKey;
+            return certResponse;
         }
 
-        public async Task<SystemX509.X509Certificate2> StoreCertificate(Pkcs10CertificationRequest signingRequest)
+        public async Task<CertificateTransactionResponse> StoreCertificate(Pkcs10CertificationRequest signingRequest)
         {
             var payload = new CertificateRequestPayload(signingRequest);
-            var result = await _remmeRest
+            var apiResult = await _remmeRest
                 .PutRequest<CertificateRequestPayload, CertificateResult>(
                             payload,
                             RemmeMethodsEnum.CertificateStore);
 
-            return GetCertificateFromResponse(result.CertificatePEM);
+            
+            var result = new CertificateTransactionResponse(_nodeAddress);
+            result.BatchId = apiResult.BachId;
+            result.Certificate = GetCertificateFromResponse(apiResult.CertificatePEM);
+
+            return result;
         }
 
         public async Task<bool> CheckCertificate(SystemX509.X509Certificate2 certificate)
