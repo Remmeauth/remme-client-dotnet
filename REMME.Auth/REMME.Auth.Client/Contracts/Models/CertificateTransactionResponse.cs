@@ -1,5 +1,4 @@
-﻿using REMME.Auth.Client.RemmeApi.Models;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Security.Cryptography.X509Certificates;
 
 namespace REMME.Auth.Client.Contracts.Models
 {

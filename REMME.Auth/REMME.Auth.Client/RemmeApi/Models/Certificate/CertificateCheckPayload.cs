@@ -5,14 +5,14 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace REMME.Auth.Client.RemmeApi.Models
 {
-    public class CertificateCheckPayload
+    public class CertificatePayload
     {
         public const string CERTIFICATE_FORMAT =
     "-----BEGIN CERTIFICATE-----\n{0}\n-----END CERTIFICATE-----";
 
-        public CertificateCheckPayload() { }
+        public CertificatePayload() { }
 
-        public CertificateCheckPayload(X509Certificate2 certificate)
+        public CertificatePayload(X509Certificate2 certificate)
         {
             var bytes = certificate.Export(X509ContentType.Cert);
 

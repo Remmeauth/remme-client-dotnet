@@ -1,11 +1,7 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using WebSocketSharp;
 
 namespace REMME.Auth.Client.RemmeApi
 {
@@ -17,15 +13,14 @@ namespace REMME.Auth.Client.RemmeApi
             _nodeAddress = nodeAddress;
         }
 
-        public async Task<Output> PutRequest<Input, Output>(Input requestPayload, RemmeMethodsEnum method)
+        public string Address { get => _nodeAddress; }
+
+        public async Task<Output> GetRequest<Output>(RemmeMethodsEnum method, string requestPayload = null)
         {
             Output result = default(Output);
             using (var client = new HttpClient())
             {
-                var stringPayload = JsonConvert.SerializeObject(requestPayload);
-                var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
-
-                var response = await client.PutAsync(GetUrlForRequest(method), httpContent);
+                var response = await client.GetAsync(GetUrlForRequest(method, requestPayload));
                 var str = await response.Content.ReadAsStringAsync();
                 result = JsonConvert.DeserializeObject<Output>(str);
             }
@@ -33,15 +28,12 @@ namespace REMME.Auth.Client.RemmeApi
             return result;
         }
 
-        public async Task<Output> PostRequest<Input, Output>(Input requestPayload, RemmeMethodsEnum method)
+        public async Task<Output> PutRequest<Input, Output>(RemmeMethodsEnum method, Input requestPayload)
         {
             Output result = default(Output);
             using (var client = new HttpClient())
             {
-                var stringPayload = JsonConvert.SerializeObject(requestPayload);
-                var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
-
-                var response = await client.PostAsync(GetUrlForRequest(method), httpContent);
+                var response = await client.PutAsync(GetUrlForRequest(method), GetHttpContent(requestPayload));
                 var str = await response.Content.ReadAsStringAsync();
                 result = JsonConvert.DeserializeObject<Output>(str);
             }
@@ -49,7 +41,43 @@ namespace REMME.Auth.Client.RemmeApi
             return result;
         }
 
-        private string GetUrlForRequest(RemmeMethodsEnum method)
+        public async Task<Output> PostRequest<Input, Output>(RemmeMethodsEnum method, Input requestPayload)
+        {
+            Output result = default(Output);
+            using (var client = new HttpClient())
+            {
+                var response = await client.PostAsync(GetUrlForRequest(method), GetHttpContent(requestPayload));
+                var str = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<Output>(str);
+            }
+
+            return result;
+        }
+
+        public async Task<Output> DeleteRequest<Input, Output>(RemmeMethodsEnum method, Input requestPayload)
+        {
+            Output result = default(Output);
+            using (var client = new HttpClient())
+            {
+                var request = new HttpRequestMessage(HttpMethod.Delete, GetUrlForRequest(method));
+                request.Content = GetHttpContent(requestPayload);
+
+                var response = await client.SendAsync(request);
+
+                var str = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<Output>(str);
+            }
+
+            return result;
+        }
+
+        private StringContent GetHttpContent(object requestPayload)
+        {
+            var stringPayload = JsonConvert.SerializeObject(requestPayload);
+            return new StringContent(stringPayload, Encoding.UTF8, "application/json");
+        }
+
+        private string GetUrlForRequest(RemmeMethodsEnum method, string urlParameter = null)
         {
             string methodUrl = string.Empty;
             switch (method)
@@ -71,7 +99,8 @@ namespace REMME.Auth.Client.RemmeApi
                     break;
             }
 
-            return string.Format("http://{0}/api/v1/{1}", _nodeAddress, methodUrl);
+            var baseUrl = string.Format("http://{0}/api/v1/{1}", _nodeAddress, methodUrl);
+            return urlParameter == null ? baseUrl : string.Format("{0}/{1}", baseUrl, urlParameter);
         }
     }
 }

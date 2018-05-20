@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 using WebSocketSharp;
 
-namespace REMME.Auth.Client.RemmeApi.Models
+namespace REMME.Auth.Client.Contracts.Models
 {
     public interface ITransactionResponse
     {

@@ -33,6 +33,9 @@
     <Reference Include="BouncyCastle.Crypto, Version=1.8.2.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
       <HintPath>..\packages\BouncyCastle.1.8.2\lib\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
+    <Reference Include="Google.Protobuf, Version=3.5.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Protobuf.3.5.1\lib\net45\Google.Protobuf.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -51,16 +54,31 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contracts\IRemmePersonal.cs" />
+    <Compile Include="Contracts\Models\CertificateCreateDto.cs" />
     <Compile Include="Contracts\Models\CertificateTransactionResponse.cs" />
-    <Compile Include="RemmeApi\Models\CertificateCheckPayload.cs" />
-    <Compile Include="RemmeApi\Models\CertificateCheckResult.cs" />
-    <Compile Include="RemmeApi\Models\CertificateRequestPayload.cs" />
-    <Compile Include="RemmeApi\Models\CertificateResult.cs" />
-    <Compile Include="RemmeApi\Models\BaseTransactionResonse.cs" />
+    <Compile Include="Contracts\IRemmeCertificate.cs" />
+    <Compile Include="Contracts\IRemmeToken.cs" />
+    <Compile Include="Contracts\Models\RemmeAccountDto.cs" />
+    <Compile Include="Implementation\RemmeClient.cs" />
+    <Compile Include="Implementation\RemmePersonal.cs" />
+    <Compile Include="Implementation\RemmeToken.cs" />
+    <Compile Include="RemmeApi\Models\Certificate\CertificateCheckPayload.cs" />
+    <Compile Include="RemmeApi\Models\Certificate\CertificateCheckResult.cs" />
+    <Compile Include="RemmeApi\Models\Certificate\CertificateRequestPayload.cs" />
+    <Compile Include="RemmeApi\Models\Certificate\CertificateResult.cs" />
+    <Compile Include="Contracts\Models\BaseTransactionResonse.cs" />
+    <Compile Include="RemmeApi\Models\Protos\Certificate.cs" />
+    <Compile Include="RemmeApi\Models\Protos\SawtoothTransaction.cs" />
+    <Compile Include="RemmeApi\Models\Protos\Token.cs" />
+    <Compile Include="RemmeApi\Models\Protos\Transaction.cs" />
+    <Compile Include="RemmeApi\Models\Token\BalanceCheckResult.cs" />
+    <Compile Include="RemmeApi\Models\Token\TransferPayload.cs" />
+    <Compile Include="RemmeApi\Models\Token\TransferResult.cs" />
     <Compile Include="RemmeApi\RemmeMethodsEnum.cs" />
     <Compile Include="RemmeApi\RemmeRest.cs" />
-    <Compile Include="RemmeApi\Models\ITransactionResponse.cs" />
-    <Compile Include="RemmeClient.cs" />
+    <Compile Include="Contracts\Models\ITransactionResponse.cs" />
+    <Compile Include="Implementation\RemmeCertificate.cs" />
     <Compile Include="Contracts\IRemmeClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
