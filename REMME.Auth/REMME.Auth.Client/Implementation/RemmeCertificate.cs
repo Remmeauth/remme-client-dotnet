@@ -18,6 +18,7 @@ using Org.BouncyCastle.Crypto.Prng;
 using System.Security.Cryptography;
 using SystemX509 = System.Security.Cryptography.X509Certificates;
 using REMME.Auth.Client.RemmeApi.Models;
+using REMME.Auth.Client.RemmeApi.Models.Certificate;
 
 namespace REMME.Auth.Client.Implementation
 {
@@ -25,7 +26,6 @@ namespace REMME.Auth.Client.Implementation
     {
         private readonly RemmeRest _remmeRest;
         private const int _rsaKeySize = 2048;
-        private readonly string _nodeAddress;
 
         public RemmeCertificate(RemmeRest remmeRest)
         {
@@ -60,7 +60,7 @@ namespace REMME.Auth.Client.Implementation
                             RemmeMethodsEnum.CertificateStore,
                             payload);
 
-            var result = new CertificateTransactionResponse(_remmeRest.Address);
+            var result = new CertificateTransactionResponse(_remmeRest.NodeAddress);
             result.BatchId = apiResult.BachId;
             result.Certificate = GetCertificateFromPem(apiResult.CertificatePEM);
 
@@ -129,7 +129,7 @@ namespace REMME.Auth.Client.Implementation
         //TODO: In current version of REMME REST API there is no result for REVOKE operation
         //While implementing it via external API we should consider getting BATCH ID, so we know 
         //when block will be writen to REMCHain with revoke data
-        public async Task<BaseTransactionResonse> Revoke(SystemX509.X509Certificate2 certificate)
+        public async Task<BaseTransactionResponse> Revoke(SystemX509.X509Certificate2 certificate)
         {
             var payload = new CertificatePayload(certificate);
 
@@ -138,19 +138,29 @@ namespace REMME.Auth.Client.Implementation
                             RemmeMethodsEnum.Certificate,
                             payload);
 
-            return new BaseTransactionResonse(_remmeRest.Address);
+            return new BaseTransactionResponse(_remmeRest.NodeAddress);
         }
 
-        public Task<BaseTransactionResonse> Revoke(string pemEncodedCRT)
+        public Task<BaseTransactionResponse> Revoke(string pemEncodedCRT)
         {
             return Revoke(GetCertificateFromPem(pemEncodedCRT));
         }
 
-        public Task<BaseTransactionResonse> Revoke(byte[] encodedCRT)
+        public Task<BaseTransactionResponse> Revoke(byte[] encodedCRT)
         {
             return Revoke(new SystemX509.X509Certificate2(encodedCRT));
         }
 
+        #endregion
+
+        #region Read
+        public async Task<IEnumerable<string>> GetUserCertificates(string userPublicKey)
+        {
+            var result = await _remmeRest.GetRequest<UserCertificatesResult>(
+                                RemmeMethodsEnum.UserCertificates, userPublicKey);
+
+            return result.CertificateAdresses;
+        }
         #endregion
 
         #region Helpers
@@ -173,7 +183,7 @@ namespace REMME.Auth.Client.Implementation
                 { X509Name.CN, certificateDataToCreate.CommonName },
                 //{ X509Name.EmailAddress, certificateDataToCreate.Email }
             };
-            
+
             return new X509Name(attributes.Keys.ToList(), attributes);
         }
 

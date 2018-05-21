@@ -13,55 +13,47 @@ namespace REMME.Auth.Client.RemmeApi
             _nodeAddress = nodeAddress;
         }
 
-        public string Address { get => _nodeAddress; }
+        public string NodeAddress { get => _nodeAddress; }
 
         public async Task<Output> GetRequest<Output>(RemmeMethodsEnum method, string requestPayload = null)
         {
-            Output result = default(Output);
-            using (var client = new HttpClient())
-            {
-                var response = await client.GetAsync(GetUrlForRequest(method, requestPayload));
-                var str = await response.Content.ReadAsStringAsync();
-                result = JsonConvert.DeserializeObject<Output>(str);
-            }
+            var request = new HttpRequestMessage(HttpMethod.Get, GetUrlForRequest(method, requestPayload));
 
-            return result;
+            return await SendRequest<Output>(request);
         }
 
         public async Task<Output> PutRequest<Input, Output>(RemmeMethodsEnum method, Input requestPayload)
         {
-            Output result = default(Output);
-            using (var client = new HttpClient())
-            {
-                var response = await client.PutAsync(GetUrlForRequest(method), GetHttpContent(requestPayload));
-                var str = await response.Content.ReadAsStringAsync();
-                result = JsonConvert.DeserializeObject<Output>(str);
-            }
+            var request = new HttpRequestMessage(HttpMethod.Put, GetUrlForRequest(method));
+            request.Content = GetHttpContent(requestPayload);
 
-            return result;
+            return await SendRequest<Output>(request);
         }
 
         public async Task<Output> PostRequest<Input, Output>(RemmeMethodsEnum method, Input requestPayload)
         {
-            Output result = default(Output);
-            using (var client = new HttpClient())
-            {
-                var response = await client.PostAsync(GetUrlForRequest(method), GetHttpContent(requestPayload));
-                var str = await response.Content.ReadAsStringAsync();
-                result = JsonConvert.DeserializeObject<Output>(str);
-            }
+            var request = new HttpRequestMessage(HttpMethod.Post, GetUrlForRequest(method));
+            request.Content = GetHttpContent(requestPayload);
 
-            return result;
+            return await SendRequest<Output>(request);
         }
 
         public async Task<Output> DeleteRequest<Input, Output>(RemmeMethodsEnum method, Input requestPayload)
         {
+            var request = new HttpRequestMessage(HttpMethod.Delete, GetUrlForRequest(method));
+            request.Content = GetHttpContent(requestPayload);
+
+            return await SendRequest<Output>(request);
+        }
+
+        #region Helpers
+
+        private async Task<Output> SendRequest<Output>(HttpRequestMessage request)
+        {
             Output result = default(Output);
+
             using (var client = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Delete, GetUrlForRequest(method));
-                request.Content = GetHttpContent(requestPayload);
-
                 var response = await client.SendAsync(request);
 
                 var str = await response.Content.ReadAsStringAsync();
@@ -97,10 +89,20 @@ namespace REMME.Auth.Client.RemmeApi
                 case RemmeMethodsEnum.Personal:
                     methodUrl = "personal";
                     break;
+                case RemmeMethodsEnum.UserCertificates:
+                    methodUrl = "user";
+                    break;
             }
 
             var baseUrl = string.Format("http://{0}/api/v1/{1}", _nodeAddress, methodUrl);
-            return urlParameter == null ? baseUrl : string.Format("{0}/{1}", baseUrl, urlParameter);
+            var output = urlParameter == null ? baseUrl : string.Format("{0}/{1}", baseUrl, urlParameter);
+
+            //TODO: Refactor this code to be more readable
+            if (method == RemmeMethodsEnum.UserCertificates) output = output + "/certificates";
+
+            return output;
         }
+
+        #endregion
     }
 }

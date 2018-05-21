@@ -2,7 +2,7 @@
 
 namespace REMME.Auth.Client.Contracts.Models
 {
-    public class CertificateTransactionResponse : BaseTransactionResonse
+    public class CertificateTransactionResponse : BaseTransactionResponse
     {
         public CertificateTransactionResponse(string socketAddress)
             : base(socketAddress)

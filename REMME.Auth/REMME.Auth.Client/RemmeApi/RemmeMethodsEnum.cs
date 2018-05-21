@@ -6,6 +6,7 @@
         CertificateStore, 
         Token,
         BatchStatus, 
-        Personal
+        Personal,
+        UserCertificates
     }
 }

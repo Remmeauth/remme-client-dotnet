@@ -23,7 +23,7 @@ namespace REMME.Auth.Client.Implementation
             return Convert.ToInt32(result.Balance);
         }
 
-        public async Task<BaseTransactionResonse> Transfer(string publicKeyTo, int amount)
+        public async Task<BaseTransactionResponse> Transfer(string publicKeyTo, int amount)
         {
             var payload = new TransferPayload { PublicKeyTo = publicKeyTo, Amount = amount };
 
@@ -31,7 +31,7 @@ namespace REMME.Auth.Client.Implementation
                             RemmeMethodsEnum.Token,
                             payload);
 
-            return new BaseTransactionResonse(_remmeRest.Address) { BatchId = result.BachId };
+            return new BaseTransactionResponse(_remmeRest.NodeAddress) { BatchId = result.BachId };
         }
     }
 }

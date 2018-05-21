@@ -3,12 +3,12 @@ using WebSocketSharp;
 
 namespace REMME.Auth.Client.Contracts.Models
 {
-    public class BaseTransactionResonse : ITransactionResponse
+    public class BaseTransactionResponse : ITransactionResponse
     {
         private WebSocket _webSocket;
         private string _socketAddress;
 
-        public BaseTransactionResonse(string socketAddress)
+        public BaseTransactionResponse(string socketAddress)
         {
             _socketAddress = socketAddress;
         }

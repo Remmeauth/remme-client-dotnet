@@ -1,5 +1,6 @@
 ﻿using Org.BouncyCastle.Pkcs;
 using REMME.Auth.Client.Contracts.Models;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -97,7 +98,7 @@ namespace REMME.Auth.Client.Contracts
         /// </summary>
         /// <param name="certificate">X509Certificate2 object to get public data from</param>
         /// <returns>Base transaction response with Event for subscription inside</returns>
-        Task<BaseTransactionResonse> Revoke(X509Certificate2 certificate);
+        Task<BaseTransactionResponse> Revoke(X509Certificate2 certificate);
 
         /// <remarks>WILL BE REIMPLEMENTED INSIDE AFTER EXTERNALL API IS FINISHED. INTERFACE WILL BE THE SAME</remarks>
         /// <summary>
@@ -105,7 +106,7 @@ namespace REMME.Auth.Client.Contracts
         /// </summary>
         /// <param name="certificate">PEM encoded string of cert to get public data from</param>
         /// <returns>Base transaction response with Event for subscription inside</returns>
-        Task<BaseTransactionResonse> Revoke(string pemEncodedCRT);
+        Task<BaseTransactionResponse> Revoke(string pemEncodedCRT);
 
         /// <remarks>WILL BE REIMPLEMENTED INSIDE AFTER EXTERNALL API IS FINISHED. INTERFACE WILL BE THE SAME</remarks>
         /// <summary>
@@ -113,6 +114,13 @@ namespace REMME.Auth.Client.Contracts
         /// </summary>
         /// <param name="certificate">Public bytes of cert to get public data from</param>
         /// <returns>Base transaction response with Event for subscription inside</returns>
-        Task<BaseTransactionResonse> Revoke(byte[] encodedCRT);
+        Task<BaseTransactionResponse> Revoke(byte[] encodedCRT);
+
+        /// <summary>
+        /// Retrieves the certificates of the specified user
+        /// </summary>
+        /// <param name="userPublicKey">The public key of the user to get the certificates</param>
+        /// <returns>The addresses of certificates for the specified user</returns>
+        Task<IEnumerable<string>> GetUserCertificates(string userPublicKey);
     }
 }

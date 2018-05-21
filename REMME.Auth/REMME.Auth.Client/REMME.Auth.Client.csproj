@@ -68,6 +68,7 @@
     <Compile Include="RemmeApi\Models\Certificate\CertificateRequestPayload.cs" />
     <Compile Include="RemmeApi\Models\Certificate\CertificateResult.cs" />
     <Compile Include="Contracts\Models\BaseTransactionResonse.cs" />
+    <Compile Include="RemmeApi\Models\Certificate\UserCertificatesResult.cs" />
     <Compile Include="RemmeApi\Models\Protos\Certificate.cs" />
     <Compile Include="RemmeApi\Models\Protos\SawtoothTransaction.cs" />
     <Compile Include="RemmeApi\Models\Protos\Token.cs" />
