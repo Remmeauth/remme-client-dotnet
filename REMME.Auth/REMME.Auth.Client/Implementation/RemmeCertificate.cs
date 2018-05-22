@@ -19,6 +19,7 @@ using System.Security.Cryptography;
 using SystemX509 = System.Security.Cryptography.X509Certificates;
 using REMME.Auth.Client.RemmeApi.Models;
 using REMME.Auth.Client.RemmeApi.Models.Certificate;
+using System.Reflection;
 
 namespace REMME.Auth.Client.Implementation
 {
@@ -34,6 +35,7 @@ namespace REMME.Auth.Client.Implementation
 
         #region Creation 
 
+        //TODO: Use Validity options after REMME node REST API will support that
         public async Task<CertificateTransactionResponse> CreateAndStoreCertificate(CertificateCreateDto certificateDataToCreate)
         {
             var subject = CreateSubject(certificateDataToCreate);
@@ -176,15 +178,38 @@ namespace REMME.Auth.Client.Implementation
         private X509Name CreateSubject(CertificateCreateDto certificateDataToCreate)
         {
             if (string.IsNullOrEmpty(certificateDataToCreate.CommonName))
-                throw new ArgumentException("CommonName should be set");
+                throw new ArgumentException("'Common name' must have value");
+            if (certificateDataToCreate.Validity == 0)
+                throw new ArgumentException("'Validity' must have value");
 
-            var attributes = new Dictionary<DerObjectIdentifier, string>
-            {
-                { X509Name.CN, certificateDataToCreate.CommonName },
-                //{ X509Name.EmailAddress, certificateDataToCreate.Email }
-            };
-
+            //TODO: Refactor this method to look better
+            var attributes = new Dictionary<DerObjectIdentifier, string>();
+            AddValueToSubject(attributes, X509Name.CN, certificateDataToCreate.CommonName);
+            AddValueToSubject(attributes, X509Name.EmailAddress, certificateDataToCreate.Email);
+            AddValueToSubject(attributes, X509Name.C, certificateDataToCreate.CountryName);
+            AddValueToSubject(attributes, X509Name.L, certificateDataToCreate.LocalityName);
+            AddValueToSubject(attributes, X509Name.PostalAddress, certificateDataToCreate.PostalAddress);
+            AddValueToSubject(attributes, X509Name.PostalCode, certificateDataToCreate.PostalCode);
+            AddValueToSubject(attributes, X509Name.Street, certificateDataToCreate.StreetAddress);
+            AddValueToSubject(attributes, X509Name.ST, certificateDataToCreate.StateName);
+            AddValueToSubject(attributes, X509Name.Name, certificateDataToCreate.Name);
+            AddValueToSubject(attributes, X509Name.Surname, certificateDataToCreate.Surname);
+            AddValueToSubject(attributes, X509Name.Pseudonym, certificateDataToCreate.Pseudonym);
+            AddValueToSubject(attributes, X509Name.Generation, certificateDataToCreate.GenerationQualifier);
+            AddValueToSubject(attributes, X509Name.T, certificateDataToCreate.Title);
+            AddValueToSubject(attributes, X509Name.SerialNumber, certificateDataToCreate.Serial);
+            AddValueToSubject(attributes, X509Name.BusinessCategory, certificateDataToCreate.BusinessCategory);
+            
             return new X509Name(attributes.Keys.ToList(), attributes);
+        }
+
+        private void AddValueToSubject(Dictionary<DerObjectIdentifier, string> subject,
+                                       DerObjectIdentifier identifier,
+                                       string value)
+        {
+
+            if (!string.IsNullOrEmpty(value))
+                subject.Add(identifier, value);
         }
 
         private AsymmetricCipherKeyPair GenerateKeyPair()

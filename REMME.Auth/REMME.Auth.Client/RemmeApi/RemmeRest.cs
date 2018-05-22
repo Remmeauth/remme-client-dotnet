@@ -1,11 +1,12 @@
 ﻿using Newtonsoft.Json;
+using REMME.Auth.Client.Contracts.Exceptions;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace REMME.Auth.Client.RemmeApi
 {
-    public class RemmeRest
+    public class RemmeRest: IRemmeRest
     {
         private readonly string _nodeAddress;
         private readonly string _socketAddress;
@@ -59,9 +60,21 @@ namespace REMME.Auth.Client.RemmeApi
 
             using (var client = new HttpClient())
             {
-                var response = await client.SendAsync(request);
+                HttpResponseMessage response = null;
+                try
+                {
+                    response = await client.SendAsync(request);
+                }
+                catch (HttpRequestException)
+                {
+                    throw new RemmeConnectionException("Cannot reach REMME node via REST API");
+                }
 
                 var str = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    throw new RemmeNodeException(str);
+
                 result = JsonConvert.DeserializeObject<Output>(str);
             }
 

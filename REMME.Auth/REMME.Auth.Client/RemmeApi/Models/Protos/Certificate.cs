@@ -38,7 +38,7 @@ namespace REMME.Auth.Client.RemmeApi.Models.Proto {
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::REMME.Auth.Client.RemmeApi.Models.Proto.CertificateMethod), global::REMME.Auth.Client.RemmeApi.Models.Proto.CertificateMethod.Parser, null, null, new[]{ typeof(global::REMME.Auth.Client.RemmeApi.Models.Proto.CertificateMethod.Types.Method) }, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::REMME.Auth.Client.RemmeApi.Models.Proto.NewCertificatePayload), global::REMME.Auth.Client.RemmeApi.Models.Proto.NewCertificatePayload.Parser, new[]{ "CertificateRaw", "SignatureRem", "SignatureCrt", "CertSignerPublicKey" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::REMME.Auth.Client.RemmeApi.Models.Proto.RevokeCertificatePayload), global::REMME.Auth.Client.RemmeApi.Models.Proto.RevokeCertificatePayload.Parser, new[]{ "Address" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::REMME.Auth.Client.RemmeApi.Models.Proto.RevokeCertificatePayload), global::REMME.Auth.Client.RemmeApi.Models.Proto.RevokeCertificatePayload.Parser, new[]{ "NodeAddress" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::REMME.Auth.Client.RemmeApi.Models.Proto.CertificateStorage), global::REMME.Auth.Client.RemmeApi.Models.Proto.CertificateStorage.Parser, new[]{ "Hash", "Owner", "Revoked" }, null, null, null)
           }));
     }

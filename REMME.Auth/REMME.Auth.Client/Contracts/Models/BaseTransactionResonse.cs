@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
+using REMME.Auth.Client.Contracts.Exceptions;
 using REMME.Auth.Client.RemmeApi.Models;
 using System;
+using System.Net.Sockets;
 using WebSocketSharp;
 
 namespace REMME.Auth.Client.Contracts.Models
@@ -40,15 +42,18 @@ namespace REMME.Auth.Client.Contracts.Models
                 _webSocket.OnMessage += _webSocket_OnMessage;
 
             _webSocket.Connect();
-            _webSocket.Send(GetSocketQueryMessage());
 
+            if (_webSocket.ReadyState != WebSocketState.Open)
+                throw new RemmeConnectionException("Cannot reach REMME node via sockets endpoint");
+
+            _webSocket.Send(GetSocketQueryMessage());
         }
 
         private void _webSocket_OnMessage(object sender, MessageEventArgs e)
         {
             var response = JsonConvert.DeserializeObject<BatchStateUpdateDto>(e.Data);
 
-            if(response.Type == "message" && response.Data != null)
+            if (response.Type == "message" && response.Data != null)
             {
                 switch (response.Data.BatchStatuses.Status)
                 {
