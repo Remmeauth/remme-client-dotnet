@@ -31,7 +31,7 @@ namespace REMME.Auth.Client.Implementation
                             RemmeMethodsEnum.Token,
                             payload);
 
-            return new BaseTransactionResponse(_remmeRest.NodeAddress) { BatchId = result.BachId };
+            return new BaseTransactionResponse(_remmeRest.SocketAddress) { BatchId = result.BachId };
         }
     }
 }

@@ -8,12 +8,17 @@ namespace REMME.Auth.Client.RemmeApi
     public class RemmeRest
     {
         private readonly string _nodeAddress;
-        public RemmeRest(string nodeAddress = "localhost:8080")
+        private readonly string _socketAddress;
+
+        public RemmeRest(string nodeAddress = "localhost:8080",
+                         string socketAddress = "localhost:9080")
         {
             _nodeAddress = nodeAddress;
+            _socketAddress = socketAddress;
         }
 
         public string NodeAddress { get => _nodeAddress; }
+        public string SocketAddress { get => _socketAddress; }
 
         public async Task<Output> GetRequest<Output>(RemmeMethodsEnum method, string requestPayload = null)
         {

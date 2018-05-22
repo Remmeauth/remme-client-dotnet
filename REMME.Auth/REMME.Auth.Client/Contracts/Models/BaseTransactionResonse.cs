@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using REMME.Auth.Client.RemmeApi.Models;
+using System;
 using WebSocketSharp;
 
 namespace REMME.Auth.Client.Contracts.Models
@@ -15,12 +17,15 @@ namespace REMME.Auth.Client.Contracts.Models
 
         public string BatchId { get; set; }
 
-        public event EventHandler<MessageEventArgs> BatchConfirmed;
+        public event EventHandler<BatchStatus> BatchConfirmed;
 
         public void CloseWebSocket()
         {
             if (_webSocket != null && _webSocket.IsAlive)
+            {
+                _webSocket.Send(GetSocketQueryMessage(subscribe: false));
                 _webSocket.CloseAsync();
+            }
         }
 
         public void ConnectToWebSocket()
@@ -29,25 +34,49 @@ namespace REMME.Auth.Client.Contracts.Models
             {
                 CloseWebSocket();
             }
-            _webSocket = new WebSocket(_socketAddress);
+            _webSocket = new WebSocket(GetSubscribeUrl());
 
             if (BatchConfirmed != null)
-                _webSocket.OnMessage += (sender, e) => BatchConfirmed(sender, e);
+                _webSocket.OnMessage += _webSocket_OnMessage;
 
             _webSocket.Connect();
+            _webSocket.Send(GetSocketQueryMessage());
 
-            //TODO format message in right way after sockets will be implemented
-            //First message should be formatted with using BathID
-            _webSocket.Send(GetSocketSubscribeMessage());
-
-            //Here should be check of response data and different Events should triggered
-            //BathcConfirmed, BatchRejected .... 
         }
 
-        private string GetSocketSubscribeMessage()
+        private void _webSocket_OnMessage(object sender, MessageEventArgs e)
         {
-            //TODO generate message from BatchID
-            return BatchId;
+            var response = JsonConvert.DeserializeObject<BatchStateUpdateDto>(e.Data);
+
+            if(response.Type == "message" && response.Data != null)
+            {
+                switch (response.Data.BatchStatuses.Status)
+                {
+                    case "OK":
+                        BatchConfirmed(sender, response.Data.BatchStatuses);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private string GetSubscribeUrl()
+        {
+            return string.Format("ws://{0}/ws", _socketAddress);
+        }
+
+        private string GetSocketQueryMessage(bool subscribe = true)
+        {
+            var requestData = new BatchStatusQueryDto()
+            {
+                Type = "request",
+                Action = subscribe ? "subscribe" : "unsubscribe",
+                Entity = "batch_state",
+                Id = new Random().Next(1, 10000)
+            };
+            requestData.Parameters.BatchIds.Add(BatchId);
+            return JsonConvert.SerializeObject(requestData);
         }
     }
 }

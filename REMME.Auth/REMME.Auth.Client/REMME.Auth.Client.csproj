@@ -63,6 +63,8 @@
     <Compile Include="Implementation\RemmeClient.cs" />
     <Compile Include="Implementation\RemmePersonal.cs" />
     <Compile Include="Implementation\RemmeToken.cs" />
+    <Compile Include="RemmeApi\Models\Sockets\BatchStateUpdateDto.cs" />
+    <Compile Include="RemmeApi\Models\Sockets\BatchStatusDto.cs" />
     <Compile Include="RemmeApi\Models\Certificate\CertificateCheckPayload.cs" />
     <Compile Include="RemmeApi\Models\Certificate\CertificateCheckResult.cs" />
     <Compile Include="RemmeApi\Models\Certificate\CertificateRequestPayload.cs" />

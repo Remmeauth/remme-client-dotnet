@@ -60,7 +60,7 @@ namespace REMME.Auth.Client.Implementation
                             RemmeMethodsEnum.CertificateStore,
                             payload);
 
-            var result = new CertificateTransactionResponse(_remmeRest.NodeAddress);
+            var result = new CertificateTransactionResponse(_remmeRest.SocketAddress);
             result.BatchId = apiResult.BachId;
             result.Certificate = GetCertificateFromPem(apiResult.CertificatePEM);
 
@@ -138,7 +138,7 @@ namespace REMME.Auth.Client.Implementation
                             RemmeMethodsEnum.Certificate,
                             payload);
 
-            return new BaseTransactionResponse(_remmeRest.NodeAddress);
+            return new BaseTransactionResponse(_remmeRest.SocketAddress);
         }
 
         public Task<BaseTransactionResponse> Revoke(string pemEncodedCRT)

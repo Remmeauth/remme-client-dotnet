@@ -1,5 +1,5 @@
-﻿using System;
-using WebSocketSharp;
+﻿using REMME.Auth.Client.RemmeApi.Models;
+using System;
 
 namespace REMME.Auth.Client.Contracts.Models
 {
@@ -7,7 +7,7 @@ namespace REMME.Auth.Client.Contracts.Models
     {
         string BatchId { get; set; }
         
-        event EventHandler<MessageEventArgs> BatchConfirmed;
+        event EventHandler<BatchStatus> BatchConfirmed;
 
         void ConnectToWebSocket();
 
