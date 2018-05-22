@@ -27,11 +27,13 @@ namespace REMME.Auth.Client.Implementation
 
             Certificate = new RemmeCertificate(_remmeRest);
             Token = new RemmeToken(_remmeRest);
+            Batch = new RemmeBatch(_remmeRest);
             Personal = new RemmePersonal();
         }
 
         public IRemmeCertificate Certificate { get; private set; }
         public IRemmeToken Token { get; private set; }
         public IRemmePersonal Personal { get; private set; }
+        public IRemmeBatch Batch { get; private set; }
     }
 }

@@ -7,5 +7,7 @@
         IRemmeToken Token { get; }
 
         IRemmePersonal Personal { get; }
+
+        IRemmeBatch Batch { get; }
     }
 }

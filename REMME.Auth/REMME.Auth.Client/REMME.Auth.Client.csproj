@@ -56,16 +56,19 @@
   <ItemGroup>
     <Compile Include="Contracts\Exceptions\RemmeConnectionException.cs" />
     <Compile Include="Contracts\Exceptions\RemmeNodeException.cs" />
+    <Compile Include="Contracts\IRemmeBatch.cs" />
     <Compile Include="Contracts\IRemmePersonal.cs" />
     <Compile Include="Contracts\Models\CertificateCreateDto.cs" />
     <Compile Include="Contracts\Models\CertificateTransactionResponse.cs" />
     <Compile Include="Contracts\IRemmeCertificate.cs" />
     <Compile Include="Contracts\IRemmeToken.cs" />
     <Compile Include="Contracts\Models\RemmeAccountDto.cs" />
+    <Compile Include="Implementation\RemmeBatch.cs" />
     <Compile Include="Implementation\RemmeClient.cs" />
     <Compile Include="Implementation\RemmePersonal.cs" />
     <Compile Include="Implementation\RemmeToken.cs" />
     <Compile Include="RemmeApi\IRemmeRest.cs" />
+    <Compile Include="RemmeApi\Models\Batch\BatchStatusResult.cs" />
     <Compile Include="RemmeApi\Models\Sockets\BatchStateUpdateDto.cs" />
     <Compile Include="RemmeApi\Models\Sockets\BatchStatusDto.cs" />
     <Compile Include="RemmeApi\Models\Certificate\CertificateCheckPayload.cs" />
