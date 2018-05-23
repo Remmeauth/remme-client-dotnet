@@ -25,10 +25,10 @@ namespace REMME.Auth.Client.Implementation
 {
     public class RemmeCertificate : IRemmeCertificate
     {
-        private readonly RemmeRest _remmeRest;
+        private readonly IRemmeRest _remmeRest;
         private const int _rsaKeySize = 2048;
 
-        public RemmeCertificate(RemmeRest remmeRest)
+        public RemmeCertificate(IRemmeRest remmeRest)
         {
             _remmeRest = remmeRest;
         }
@@ -36,6 +36,7 @@ namespace REMME.Auth.Client.Implementation
         #region Creation 
 
         //TODO: Use Validity options after REMME node REST API will support that
+        //And will be covered with UT after reimplemented
         public async Task<CertificateTransactionResponse> CreateAndStoreCertificate(CertificateCreateDto certificateDataToCreate)
         {
             var subject = CreateSubject(certificateDataToCreate);

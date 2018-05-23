@@ -9,9 +9,9 @@ namespace REMME.Auth.Client.Implementation
 {
     public class RemmeToken : IRemmeToken
     {
-        private readonly RemmeRest _remmeRest;
+        private readonly IRemmeRest _remmeRest;
 
-        public RemmeToken(RemmeRest remmeRest)
+        public RemmeToken(IRemmeRest remmeRest)
         {
             _remmeRest = remmeRest;
         }
