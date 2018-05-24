@@ -1,6 +1,6 @@
 REMME .NET Client
 ==========
-[![NuGet version](https://badge.fury.io/nu/https%3A%2F%2Fwww.nuget.org%2Fpackages%2FREMME.Auth.Client%2F1.0.0.svg)](https://badge.fury.io/nu/https%3A%2F%2Fwww.nuget.org%2Fpackages%2FREMME.Auth.Client%2F1.0.0)
+[![NuGet version](https://badge.fury.io/nu/https%3A%2F%2Fwww.nuget.org%2Fpackages%2FREMME.Auth.Client%2F0.1.0.svg)](https://badge.fury.io/nu/https%3A%2F%2Fwww.nuget.org%2Fpackages%2FREMME.Auth.Client%2F0.1.0)
 
 **An open source .NET integration library for REMChain, simplifying the access and interaction with REMME nodes both public or permissioned.**
 
