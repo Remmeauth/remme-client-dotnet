@@ -10,7 +10,7 @@ namespace REMME.Auth.Client.RemmeApi.Models.Token
     public class TransferPayload
     {
         [JsonProperty("amount")]
-        public int Amount { get; set; }
+        public long Amount { get; set; }
 
         [JsonProperty("pub_key_to")]
         public string PublicKeyTo { get; set; }

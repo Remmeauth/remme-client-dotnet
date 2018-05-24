@@ -12,7 +12,7 @@ namespace REMME.Auth.Client.Tests.Token
     public class RemmeTokenTests
     {
         private const int MOCK_BALANCE = 123;
-        private const string MOCK_PUBLIC_KEY = "somePublicKey";
+        private const string MOCK_PUBLIC_KEY = "0306796698d9b14a0ba313acc7fb14f69d8717393af5b02cc292d72009b97d8759";
         private const string MOCK_EXCEPTION_MESSAGE = "Remme Node exception Message";
         private const string MOCK_BATCH_ID = "Fake BATCH ID";
 

@@ -15,7 +15,7 @@ namespace REMME.Auth.Client.Contracts
         /// <param name="publicKeyTo">REMChain address to send token</param>
         /// <param name="amount">Amount of tokens to send</param>
         /// <returns>Base transaction response with Event for subscription inside</returns>
-        Task<BaseTransactionResponse> Transfer(string publicKeyTo, int amount);
+        Task<BaseTransactionResponse> Transfer(string publicKeyTo, long amount);
 
         /// <summary>
         /// Gets the balance of requested account

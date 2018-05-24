@@ -39,17 +39,17 @@ Examples
 #### Certificates
 ```csharp
 var certificateTransactioResult = await client
-													.Certificate
-													.CreateAndStoreCertificate(
-														new CertificateCreateDto
-														{
-															CommonName = "userName1",
-															Email = "user@email.com",
-															Name = "John",
-															Surname = "Smith",
-															CountryName = "US",
-															Validity = 360
-														});
+		Certificate
+		.CreateAndStoreCertificate(
+		new CertificateCreateDto
+			{
+				CommonName = "userName1",
+				Email = "user@email.com",
+				Name = "John",
+				Surname = "Smith",
+				CountryName = "US",
+				Validity = 360
+			});
 certificateTransactioResult.BatchConfirmed += (sender, e) =>
 {
 	var certificateStatus = client

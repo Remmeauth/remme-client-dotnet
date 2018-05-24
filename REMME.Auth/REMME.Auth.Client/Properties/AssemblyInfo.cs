@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("REMME.Auth.Client")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription(".Net integration library for REMChain")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("REMME.Auth.Client")]
+[assembly: AssemblyCompany("REMME")]
+[assembly: AssemblyProduct("REMME")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Not used by NuGet")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
