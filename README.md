@@ -21,19 +21,19 @@ Examples
 ------------
 #### Tokens
 ```csharp
-	var client = new RemmeClient("localhost:8080", "localhost:9080");
+var client = new RemmeClient("localhost:8080", "localhost:9080");
     
-	var someRemmeAddress = "0306796698d9b14a0ba313acc7f..";
+var someRemmeAddress = "0306796698d9b14a0ba313acc7f..";
     
-	var balance = await client.Token.GetBalance(someRemmeAddress);
+var balance = await client.Token.GetBalance(someRemmeAddress);
 	
-	var transactionResult = await client.Token.Transfer(someRemmeAddress, 100);
-	transactionResult.BatchConfirmed += (sender, e) =>
-	{
-		var blockNumber =  e.BlockNumber;
-		transactionResult.CloseWebSocket();
-	};
-	transactionResult.ConnectToWebSocket();
+var transactionResult = await client.Token.Transfer(someRemmeAddress, 100);
+transactionResult.BatchConfirmed += (sender, e) =>
+{
+	var blockNumber =  e.BlockNumber;
+	transactionResult.CloseWebSocket();
+};
+transactionResult.ConnectToWebSocket();
 
 ```
 #### Certificates
@@ -68,9 +68,4 @@ certificateTransactioResult.ConnectToWebSocket();
 License
 -------
 
-REMME software and documentation are licensed under `Apache License Version 2.0 <LICENCE>`_.
-
-
-
-
-
+REMME software and documentation are licensed under [Apache License Version 2.0](https://github.com/Remmeauth/remme-client-dotnet/blob/master/LICENCE).
