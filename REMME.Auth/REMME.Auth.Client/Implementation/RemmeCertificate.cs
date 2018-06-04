@@ -19,7 +19,6 @@ using System.Security.Cryptography;
 using SystemX509 = System.Security.Cryptography.X509Certificates;
 using REMME.Auth.Client.RemmeApi.Models;
 using REMME.Auth.Client.RemmeApi.Models.Certificate;
-using System.Reflection;
 
 namespace REMME.Auth.Client.Implementation
 {

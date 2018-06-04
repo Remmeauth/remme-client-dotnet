@@ -1,6 +1,5 @@
 ﻿using REMME.Auth.Client.Contracts;
 using REMME.Auth.Client.RemmeApi;
-using System;
 
 namespace REMME.Auth.Client.Implementation
 {
@@ -8,32 +7,66 @@ namespace REMME.Auth.Client.Implementation
     {
         private readonly RemmeRest _remmeRest;
 
-        /// <remarks>
-        /// pathToKeyStore is not supported yet. 
-        /// It will be supported after raw transactions 
-        /// will be implemented in future releases
-        /// </remarks>
         /// <summary>
         /// Initialize new instance of RemmeClient
         /// </summary>
         /// <param name="nodeAddress">Address and port of the REMME node Rest API</param>
         /// <param name="socketAddress">Address and port of the REMME node web sockets endpoint</param>
-        /// <param name="pathToKeyStore">Path to file with keystore. NOT IMPLEMENTED YET</param>
+        /// <param name="privateKeyHex">Hex Private Key</param>
+        public RemmeClient(string privateKeyHex,
+                           string nodeAddress = "localhost:8080",
+                           string socketAddress = "localhost:9080")
+            : this(new RemmeAccount(privateKeyHex), nodeAddress, socketAddress) { }
+
+        /// <summary>
+        /// Initialize new instance of RemmeClient
+        /// </summary>
+        /// <param name="nodeAddress">Address and port of the REMME node Rest API</param>
+        /// <param name="socketAddress">Address and port of the REMME node web sockets endpoint</param>
+        /// <param name="privateKeyBytes">Private Key Bytes</param>
+        public RemmeClient(byte[] privateKeyBytes,
+                           string nodeAddress = "localhost:8080",
+                           string socketAddress = "localhost:9080")
+            : this(new RemmeAccount(privateKeyBytes), nodeAddress, socketAddress) { }
+
+        /// <summary>
+        /// Initialize new instance of RemmeClient
+        /// </summary>
+        /// <param name="nodeAddress">Address and port of the REMME node Rest API</param>
+        /// <param name="socketAddress">Address and port of the REMME node web sockets endpoint</param>
         public RemmeClient(string nodeAddress = "localhost:8080",
-                           string socketAddress = "localhost:9080",
-                           string pathToKeyStore = "")
+                           string socketAddress = "localhost:9080")
+            : this(new RemmeAccount(), nodeAddress, socketAddress) { }
+
+        /// <summary>
+        /// Initialize new instance of RemmeClient
+        /// </summary>
+        /// <param name="nodeAddress">Address and port of the REMME node Rest API</param>
+        /// <param name="socketAddress">Address and port of the REMME node web sockets endpoint</param>
+        /// <param name="remmeAccount">Remme Account object which should incapsulate keys data</param>
+        public RemmeClient(RemmeAccount remmeAccount,
+                           string nodeAddress,
+                           string socketAddress)
         {
             _remmeRest = new RemmeRest(nodeAddress, socketAddress);
-
+            Account = remmeAccount;
             Certificate = new RemmeCertificate(_remmeRest);
             Token = new RemmeToken(_remmeRest);
             Batch = new RemmeBatch(_remmeRest);
-            Personal = new RemmePersonal();
         }
 
         public IRemmeCertificate Certificate { get; private set; }
         public IRemmeToken Token { get; private set; }
-        public IRemmePersonal Personal { get; private set; }
+        public IRemmeAccount Account { get; private set; }
         public IRemmeBatch Batch { get; private set; }
+
+        /// <summary>
+        /// Genarates new Remme Account
+        /// </summary>
+        /// <returns>Remme account object wich encapulates signing logic and key pair</returns>
+        public static IRemmeAccount GenerateNewAccount()
+        {
+            return new RemmeAccount();
+        }
     }
 }
