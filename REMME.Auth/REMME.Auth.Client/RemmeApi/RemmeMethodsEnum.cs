@@ -7,6 +7,8 @@
         Token,
         BatchStatus, 
         Personal,
-        UserCertificates
+        UserCertificates,
+        RawTransaction,
+        NodePublicKey
     }
 }

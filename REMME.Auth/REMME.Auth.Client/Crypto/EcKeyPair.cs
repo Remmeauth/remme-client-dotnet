@@ -93,13 +93,18 @@ namespace REMME.Auth.Client.Crypto
             var sig = ECDSASignature.FromDER(signer.Sign(input));
 
             byte[] result = new byte[64];
-            Array.Copy(sig.R.ToByteArray(), 1, result, 0, 32);
+            Array.Copy(TakeLastBytes(sig.R.ToByteArray(), 32), 0, result, 0, 32);
             Array.Copy(sig.S.ToByteArray(), 0, result, 32, 32);
 
             return result;
         }
 
         #region Helpers
+        private byte[] TakeLastBytes(byte[] array, int lastCount)
+        {
+            return array.Skip(Math.Max(0, array.Length - lastCount)).ToArray();
+        }
+
         private byte[] PrivateKeyToBytes()
         {
             return _privateKey.ToByteArray().Skip(1).ToArray();

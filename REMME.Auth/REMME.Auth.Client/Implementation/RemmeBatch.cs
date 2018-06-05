@@ -1,8 +1,4 @@
 ﻿using REMME.Auth.Client.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using REMME.Auth.Client.RemmeApi.Models.Batch;
 using REMME.Auth.Client.RemmeApi;
@@ -11,9 +7,9 @@ namespace REMME.Auth.Client.Implementation
 {
     public class RemmeBatch : IRemmeBatch
     {
-        private readonly RemmeRest _remmeRest;
+        private readonly IRemmeRest _remmeRest;
 
-        public RemmeBatch(RemmeRest remmeRest)
+        public RemmeBatch(IRemmeRest remmeRest)
         {
             _remmeRest = remmeRest;
         }

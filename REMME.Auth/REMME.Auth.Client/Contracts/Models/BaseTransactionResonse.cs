@@ -2,7 +2,6 @@
 using REMME.Auth.Client.Contracts.Exceptions;
 using REMME.Auth.Client.RemmeApi.Models;
 using System;
-using System.Net.Sockets;
 using WebSocketSharp;
 
 namespace REMME.Auth.Client.Contracts.Models
@@ -59,6 +58,9 @@ namespace REMME.Auth.Client.Contracts.Models
                 {
                     case "OK":
                         BatchConfirmed(sender, response.Data.BatchStatuses);
+                        break;
+                    case "NO_RESOURCE":
+                        //BatchRejectedConfirmed(sender, response.Data.BatchStatuses);
                         break;
                     default:
                         break;

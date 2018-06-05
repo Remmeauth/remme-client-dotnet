@@ -1,8 +1,11 @@
 ﻿using Moq;
 using NUnit.Framework;
+using REMME.Auth.Client.Contracts;
 using REMME.Auth.Client.Contracts.Exceptions;
+using REMME.Auth.Client.Contracts.Models;
 using REMME.Auth.Client.Implementation;
 using REMME.Auth.Client.RemmeApi;
+using REMME.Auth.Client.RemmeApi.Models.Proto;
 using REMME.Auth.Client.RemmeApi.Models.Token;
 using System;
 
@@ -26,7 +29,7 @@ namespace REMME.Auth.Client.Tests.Token
                 (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.Token == t), It.IsAny<string>()))
                 .ReturnsAsync(new BalanceCheckResult() { Balance = MOCK_BALANCE.ToString() });
 
-            var token = new RemmeToken(mock.Object);
+            var token = new RemmeToken(mock.Object, new Mock<IRemmeTransactionService>().Object);
 
             //Act
             var actualBalance = token.GetBalance(MOCK_PUBLIC_KEY).Result;
@@ -45,7 +48,7 @@ namespace REMME.Auth.Client.Tests.Token
                 (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.Token == t), It.IsAny<string>()))
                 .Throws(new RemmeNodeException(MOCK_EXCEPTION_MESSAGE));
 
-            var token = new RemmeToken(mock.Object);
+            var token = new RemmeToken(mock.Object, new Mock<IRemmeTransactionService>().Object);
 
             // Assert
             Assert.That(() => token.GetBalance(MOCK_PUBLIC_KEY),
@@ -63,7 +66,7 @@ namespace REMME.Auth.Client.Tests.Token
                 (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.Token == t), It.IsAny<string>()))
                 .Throws(new RemmeConnectionException(MOCK_EXCEPTION_MESSAGE));
 
-            var token = new RemmeToken(mock.Object);
+            var token = new RemmeToken(mock.Object, new Mock<IRemmeTransactionService>().Object);
 
             // Assert
             Assert.That(() => token.GetBalance(MOCK_PUBLIC_KEY),
@@ -76,11 +79,14 @@ namespace REMME.Auth.Client.Tests.Token
 
             // Arrange
             var mock = new Mock<IRemmeRest>();
-            mock.Setup(a => a.PostRequest<TransferPayload, TransferResult>
-                             (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.Token == t), It.IsAny<TransferPayload>()))
-                             .ReturnsAsync(new TransferResult() {  BachId = MOCK_BATCH_ID});
+            var mockTransSerive = new Mock<IRemmeTransactionService>();
+            mockTransSerive.Setup(a => a.CreateTransaction(It.IsAny<TransactionCreateDto>()))
+                 .ReturnsAsync(new Transaction());
 
-            var token = new RemmeToken(mock.Object);
+            mockTransSerive.Setup(a => a.SendTransaction(It.IsAny<Transaction>()))
+                             .ReturnsAsync(new BaseTransactionResponse("mockAddress") { BatchId = MOCK_BATCH_ID });
+
+            var token = new RemmeToken(mock.Object, mockTransSerive.Object);
             //Act
             var actualTransactionResult = token.Transfer(MOCK_PUBLIC_KEY, MOCK_BALANCE).Result;
 
@@ -94,11 +100,11 @@ namespace REMME.Auth.Client.Tests.Token
 
             // Arrange
             var mock = new Mock<IRemmeRest>();
-            mock.Setup(a => a.PostRequest<TransferPayload, TransferResult>
-                             (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.Token == t), It.IsAny<TransferPayload>()))
+            var mockTransSerive = new Mock<IRemmeTransactionService>();
+            mockTransSerive.Setup(a => a.CreateTransaction(It.IsAny<TransactionCreateDto>()))
                 .Throws(new RemmeNodeException(MOCK_EXCEPTION_MESSAGE));
 
-            var token = new RemmeToken(mock.Object);
+            var token = new RemmeToken(mock.Object, mockTransSerive.Object);
 
             // Assert
             Assert.That(() => token.Transfer(MOCK_PUBLIC_KEY, MOCK_BALANCE),
@@ -112,11 +118,11 @@ namespace REMME.Auth.Client.Tests.Token
 
             // Arrange
             var mock = new Mock<IRemmeRest>();
-            mock.Setup(a => a.PostRequest<TransferPayload, TransferResult>
-                             (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.Token == t), It.IsAny<TransferPayload>()))
+            var mockTransSerive = new Mock<IRemmeTransactionService>();
+            mockTransSerive.Setup(a => a.CreateTransaction(It.IsAny<TransactionCreateDto>()))
                 .Throws(new RemmeConnectionException(MOCK_EXCEPTION_MESSAGE));
 
-            var token = new RemmeToken(mock.Object);
+            var token = new RemmeToken(mock.Object, mockTransSerive.Object);
 
             // Assert
             Assert.That(() => token.Transfer(MOCK_PUBLIC_KEY, MOCK_BALANCE),

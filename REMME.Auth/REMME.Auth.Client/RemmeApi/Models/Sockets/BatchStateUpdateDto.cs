@@ -27,8 +27,5 @@ namespace REMME.Auth.Client.RemmeApi.Models
 
         [JsonProperty("batch_id")]
         public string BatchId { get; set; }
-
-        [JsonProperty("block_number")]
-        public int? BlockNumber { get; set; }
     }
 }

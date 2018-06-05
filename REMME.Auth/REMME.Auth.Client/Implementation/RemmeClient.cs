@@ -5,7 +5,8 @@ namespace REMME.Auth.Client.Implementation
 {
     public class RemmeClient : IRemmeClient
     {
-        private readonly RemmeRest _remmeRest;
+        private readonly IRemmeRest _remmeRest;
+        private readonly IRemmeTransactionService _remmeTransactionService;
 
         /// <summary>
         /// Initialize new instance of RemmeClient
@@ -50,8 +51,9 @@ namespace REMME.Auth.Client.Implementation
         {
             _remmeRest = new RemmeRest(nodeAddress, socketAddress);
             Account = remmeAccount;
+            _remmeTransactionService = new RemmeTransactionService(Account, _remmeRest);
             Certificate = new RemmeCertificate(_remmeRest);
-            Token = new RemmeToken(_remmeRest);
+            Token = new RemmeToken(_remmeRest, _remmeTransactionService);
             Batch = new RemmeBatch(_remmeRest);
         }
 
