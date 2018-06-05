@@ -6,7 +6,7 @@
 
         IRemmeToken Token { get; }
 
-        IRemmePersonal Personal { get; }
+        IRemmeAccount Account { get; }
 
         IRemmeBatch Batch { get; }
     }

@@ -30,8 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BouncyCastle.Crypto, Version=1.8.2.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
-      <HintPath>..\packages\BouncyCastle.1.8.2\lib\BouncyCastle.Crypto.dll</HintPath>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.2.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>..\packages\Portable.BouncyCastle.1.8.2\lib\net40\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="Google.Protobuf, Version=3.5.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Protobuf.3.5.1\lib\net45\Google.Protobuf.dll</HintPath>
@@ -54,19 +54,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contracts\Exceptions\InvalidHexFormat.cs" />
     <Compile Include="Contracts\Exceptions\RemmeConnectionException.cs" />
     <Compile Include="Contracts\Exceptions\RemmeNodeException.cs" />
+    <Compile Include="Contracts\IRemmeAccount.cs" />
     <Compile Include="Contracts\IRemmeBatch.cs" />
-    <Compile Include="Contracts\IRemmePersonal.cs" />
     <Compile Include="Contracts\Models\CertificateCreateDto.cs" />
     <Compile Include="Contracts\Models\CertificateTransactionResponse.cs" />
     <Compile Include="Contracts\IRemmeCertificate.cs" />
     <Compile Include="Contracts\IRemmeToken.cs" />
-    <Compile Include="Contracts\Models\RemmeAccountDto.cs" />
+    <Compile Include="Implementation\RemmeAccount.cs" />
+    <Compile Include="Crypto\DeterministicECDSA.cs" />
+    <Compile Include="Crypto\ECDSASignature.cs" />
+    <Compile Include="Crypto\EcKeyPair.cs" />
+    <Compile Include="Crypto\ByteExtensions.cs" />
     <Compile Include="Implementation\RemmeBatch.cs" />
     <Compile Include="Implementation\RemmeClient.cs" />
-    <Compile Include="Implementation\RemmePersonal.cs" />
     <Compile Include="Implementation\RemmeToken.cs" />
+    <Compile Include="Implementation\Utils.cs" />
     <Compile Include="RemmeApi\IRemmeRest.cs" />
     <Compile Include="RemmeApi\Models\Batch\BatchStatusResult.cs" />
     <Compile Include="RemmeApi\Models\Sockets\BatchStateUpdateDto.cs" />
