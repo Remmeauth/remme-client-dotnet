@@ -110,6 +110,12 @@ namespace REMME.Auth.Client.RemmeApi
                 case RemmeMethodsEnum.UserCertificates:
                     methodUrl = "user";
                     break;
+                case RemmeMethodsEnum.RawTransaction:
+                    methodUrl = "transaction";
+                    break;
+                case RemmeMethodsEnum.NodePublicKey:
+                    methodUrl = "node_key";
+                    break;
             }
 
             var baseUrl = string.Format("http://{0}/api/v1/{1}", _nodeAddress, methodUrl);

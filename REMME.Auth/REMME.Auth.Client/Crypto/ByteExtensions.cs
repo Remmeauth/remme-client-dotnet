@@ -1,4 +1,5 @@
-﻿using REMME.Auth.Client.Contracts.Exceptions;
+﻿using Org.BouncyCastle.Crypto.Digests;
+using REMME.Auth.Client.Contracts.Exceptions;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -32,9 +33,9 @@ namespace REMME.Auth.Client.Crypto
         }
 
         /// <summary>
-        /// Calculates the SHA512 64 byte checksum of the input bytes
+        /// Calculates the SHA512 64 byte checksum of the input string
         /// </summary>
-        /// <param name="input">bytes input to get checksum</param>
+        /// <param name="input">Input string to get checksum</param>
         /// <returns>64 byte array checksum</returns>
         public static byte[] Sha512Digest(this string input)
         {
@@ -43,6 +44,20 @@ namespace REMME.Auth.Client.Crypto
                 var data = Encoding.UTF8.GetBytes(input);
                 return shaM.ComputeHash(data);
             }
+        }
+
+        /// <summary>
+        /// Calculates the SHA512 64 byte checksum of the input bytes
+        /// </summary>
+        /// <param name="input">Bytes input to get checksum</param>
+        /// <returns>64 byte array checksum</returns>
+        public static byte[] Sha512Digest(this byte[] input)
+        {
+            var algorithm = new Sha512Digest();
+            Byte[] firstHash = new Byte[algorithm.GetDigestSize()];
+            algorithm.BlockUpdate(input, 0, input.Length);
+            algorithm.DoFinal(firstHash, 0);
+            return firstHash;
         }
     }
 }

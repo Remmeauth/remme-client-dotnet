@@ -59,10 +59,12 @@
     <Compile Include="Contracts\Exceptions\RemmeNodeException.cs" />
     <Compile Include="Contracts\IRemmeAccount.cs" />
     <Compile Include="Contracts\IRemmeBatch.cs" />
+    <Compile Include="Contracts\IRemmeTransactionService.cs" />
     <Compile Include="Contracts\Models\CertificateCreateDto.cs" />
     <Compile Include="Contracts\Models\CertificateTransactionResponse.cs" />
     <Compile Include="Contracts\IRemmeCertificate.cs" />
     <Compile Include="Contracts\IRemmeToken.cs" />
+    <Compile Include="Contracts\Models\TransactionCreateDto.cs" />
     <Compile Include="Implementation\RemmeAccount.cs" />
     <Compile Include="Crypto\DeterministicECDSA.cs" />
     <Compile Include="Crypto\ECDSASignature.cs" />
@@ -71,9 +73,12 @@
     <Compile Include="Implementation\RemmeBatch.cs" />
     <Compile Include="Implementation\RemmeClient.cs" />
     <Compile Include="Implementation\RemmeToken.cs" />
+    <Compile Include="Implementation\RemmeTransactionService.cs" />
     <Compile Include="Implementation\Utils.cs" />
     <Compile Include="RemmeApi\IRemmeRest.cs" />
     <Compile Include="RemmeApi\Models\Batch\BatchStatusResult.cs" />
+    <Compile Include="RemmeApi\Models\NodeKeyResult.cs" />
+    <Compile Include="RemmeApi\Models\RawTransactionResult.cs" />
     <Compile Include="RemmeApi\Models\Sockets\BatchStateUpdateDto.cs" />
     <Compile Include="RemmeApi\Models\Sockets\BatchStatusDto.cs" />
     <Compile Include="RemmeApi\Models\Certificate\CertificateCheckPayload.cs" />
@@ -87,7 +92,7 @@
     <Compile Include="RemmeApi\Models\Protos\Token.cs" />
     <Compile Include="RemmeApi\Models\Protos\Transaction.cs" />
     <Compile Include="RemmeApi\Models\Token\BalanceCheckResult.cs" />
-    <Compile Include="RemmeApi\Models\Token\TransferPayload.cs" />
+    <Compile Include="RemmeApi\Models\RawTransactionPayload.cs" />
     <Compile Include="RemmeApi\Models\Token\TransferResult.cs" />
     <Compile Include="RemmeApi\RemmeMethodsEnum.cs" />
     <Compile Include="RemmeApi\RemmeRest.cs" />

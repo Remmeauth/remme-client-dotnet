@@ -17,7 +17,7 @@ namespace REMME.Auth.Client.Implementation
             : this(new EcKeyPair(privateKeyBytes)) { }
 
         public RemmeAccount()
-            : this(new EcKeyPair()) { }
+            : this(EcKeyPair.GenerateNewKeyPair()) { }
 
         public RemmeAccount(EcKeyPair keyPair)
         {

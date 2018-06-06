@@ -15,6 +15,8 @@ namespace REMME.Auth.Client.Crypto
 
         public byte[] V { get; set; }
 
+        public bool IsLowS => S.CompareTo(EcKeyPair.HalfCurveOrder) <= 0;
+
         public ECDSASignature(BigInteger r, BigInteger s)
         {
             R = r;
@@ -44,6 +46,13 @@ namespace REMME.Auth.Client.Crypto
             {
                 throw new FormatException(FORMAT_EXCEPTION_MESSAGE, ex);
             }
+        }
+
+        public ECDSASignature ToCanonical()
+        {
+            if (!IsLowS)
+                return new ECDSASignature(R, EcKeyPair.CurveOrder.Subtract(S));
+            return this;
         }
 
         #region Helpers

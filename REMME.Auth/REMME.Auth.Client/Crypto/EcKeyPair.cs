@@ -23,7 +23,7 @@ namespace REMME.Auth.Client.Crypto
         /// <summary>
         /// Generates an new Elliptic Curve Keypair.
         /// </summary>
-        public EcKeyPair(bool compressedPublicKey = true)
+        private EcKeyPair(bool compressedPublicKey = true)
         {
             var generator = new ECKeyPairGenerator();
             var keygenParams = new ECKeyGenerationParameters(_ecParams, _secureRandom);
@@ -90,20 +90,23 @@ namespace REMME.Auth.Client.Crypto
             var privKey = new ECPrivateKeyParameters(_privateKey, _ecParams);
 
             signer.SetPrivateKey(privKey);
-            var sig = ECDSASignature.FromDER(signer.Sign(input));
-
+            var sig = ECDSASignature.FromDER(signer.Sign(input)).ToCanonical();
+           
             byte[] result = new byte[64];
-            Array.Copy(sig.R.ToByteArray(), 1, result, 0, 32);
-            Array.Copy(sig.S.ToByteArray(), 0, result, 32, 32);
+            
+            Array.Copy(sig.R.ToByteArrayUnsigned(), 0, result, 0, 32);
+            Array.Copy(sig.S.ToByteArrayUnsigned(), 0, result, 32, 32);
 
             return result;
         }
 
         #region Helpers
+
         private byte[] PrivateKeyToBytes()
         {
             return _privateKey.ToByteArray().Skip(1).ToArray();
         }
+
         #endregion
 
         #region Static Members
@@ -112,6 +115,9 @@ namespace REMME.Auth.Client.Crypto
         private static readonly ECDomainParameters _ecParams;
         private static readonly SecureRandom _secureRandom;
 
+        public static readonly BigInteger CurveOrder;
+        public static readonly BigInteger HalfCurveOrder;
+
         static EcKeyPair()
         {
             var secp256k1 = SecNamedCurves.GetByName(CURVE_NAME);
@@ -119,12 +125,21 @@ namespace REMME.Auth.Client.Crypto
                                                secp256k1.G,
                                                secp256k1.N,
                                                secp256k1.H);
+
+            CurveOrder = secp256k1.N;
+            HalfCurveOrder = secp256k1.N.ShiftRight(1);
+
             _secureRandom = new SecureRandom();
         }
 
         public static EcKeyPair GenerateNewKeyPair()
         {
-            return new EcKeyPair();
+            var keyPair = new EcKeyPair();
+
+            if (keyPair.PrivateKey.Length != 32)
+                return GenerateNewKeyPair();
+
+            return keyPair;
         }
         #endregion
     }
