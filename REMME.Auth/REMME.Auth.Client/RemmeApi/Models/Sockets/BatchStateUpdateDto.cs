@@ -22,10 +22,18 @@ namespace REMME.Auth.Client.RemmeApi.Models
 
     public class BatchStatus
     {
+        public BatchStatusEnum Status { get => StatusString == "OK" ? BatchStatusEnum.OK : BatchStatusEnum.NOT_CONFIRMED; }
+
         [JsonProperty("status")]
-        public string Status { get; set; }
+        public string StatusString { get; set; }
 
         [JsonProperty("batch_id")]
         public string BatchId { get; set; }
+    }
+
+    public enum BatchStatusEnum
+    {
+        NOT_CONFIRMED,
+        OK
     }
 }

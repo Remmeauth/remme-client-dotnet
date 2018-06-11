@@ -52,7 +52,7 @@ namespace REMME.Auth.Client.Implementation
             _remmeRest = new RemmeRest(nodeAddress, socketAddress);
             Account = remmeAccount;
             _remmeTransactionService = new RemmeTransactionService(Account, _remmeRest);
-            Certificate = new RemmeCertificate(_remmeRest);
+            Certificate = new RemmeCertificate(_remmeRest, _remmeTransactionService);
             Token = new RemmeToken(_remmeRest, _remmeTransactionService);
             Batch = new RemmeBatch(_remmeRest);
         }

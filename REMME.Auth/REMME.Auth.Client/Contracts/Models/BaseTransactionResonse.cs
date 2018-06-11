@@ -18,7 +18,7 @@ namespace REMME.Auth.Client.Contracts.Models
 
         public string BatchId { get; set; }
 
-        public event EventHandler<BatchStatus> BatchConfirmed;
+        public event EventHandler<BatchStatus> OnREMChainMessage;
 
         public void CloseWebSocket()
         {
@@ -37,7 +37,7 @@ namespace REMME.Auth.Client.Contracts.Models
             }
             _webSocket = new WebSocket(GetSubscribeUrl());
 
-            if (BatchConfirmed != null)
+            if (OnREMChainMessage != null)
                 _webSocket.OnMessage += _webSocket_OnMessage;
 
             _webSocket.Connect();
@@ -54,17 +54,7 @@ namespace REMME.Auth.Client.Contracts.Models
 
             if (response.Type == "message" && response.Data != null)
             {
-                switch (response.Data.BatchStatuses.Status)
-                {
-                    case "OK":
-                        BatchConfirmed(sender, response.Data.BatchStatuses);
-                        break;
-                    case "NO_RESOURCE":
-                        //BatchRejectedConfirmed(sender, response.Data.BatchStatuses);
-                        break;
-                    default:
-                        break;
-                }
+                OnREMChainMessage(sender, response.Data.BatchStatuses);
             }
         }
 

@@ -7,7 +7,7 @@ namespace REMME.Auth.Client.Contracts.Models
     {
         string BatchId { get; set; }
         
-        event EventHandler<BatchStatus> BatchConfirmed;
+        event EventHandler<BatchStatus> OnREMChainMessage;
 
         void ConnectToWebSocket();
 

@@ -19,82 +19,56 @@ using System.Security.Cryptography;
 using SystemX509 = System.Security.Cryptography.X509Certificates;
 using REMME.Auth.Client.RemmeApi.Models;
 using REMME.Auth.Client.RemmeApi.Models.Certificate;
+using Org.BouncyCastle.X509;
+using Org.BouncyCastle.Utilities;
+using REMME.Auth.Client.Contracts.Models.PyblicKeyStore;
+using REMME.Auth.Client.Crypto;
 
 namespace REMME.Auth.Client.Implementation
 {
     public class RemmeCertificate : IRemmeCertificate
     {
         private readonly IRemmeRest _remmeRest;
-        private const int _rsaKeySize = 2048;
+        private readonly IRemmeTransactionService _remmeTransactionService;
 
-        public RemmeCertificate(IRemmeRest remmeRest)
+        private const int _rsaKeySize = 2048;
+        private const string _signatureAlgorithm = "SHA512WITHRSA";
+
+        public RemmeCertificate(IRemmeRest remmeRest, IRemmeTransactionService remmeTransactionService)
         {
             _remmeRest = remmeRest;
+            _remmeTransactionService = remmeTransactionService;
         }
 
         #region Creation 
 
-        //TODO: Use Validity options after REMME node REST API will support that
-        //And will be covered with UT after reimplemented
-        public async Task<CertificateTransactionResponse> CreateAndStoreCertificate(CertificateCreateDto certificateDataToCreate)
+        public async Task<CertificateTransactionResponse> CreateAndStore(CertificateCreateDto certificateDataToCreate)
         {
             var subject = CreateSubject(certificateDataToCreate);
-            var pair = GetKeyPairWithDotNet();
-            var keyParams = (RsaPrivateCrtKeyParameters)pair.Private;
-            var rsaPrivateKey = DotNetUtilities.ToRSA(keyParams);
 
-            var pkcs10CertificationRequest = CreateSignRequest(subject, pair);
+            var randomGenerator = new CryptoApiRandomGenerator();
+            var random = new SecureRandom(randomGenerator);
+            var pair = GenerateRsaKeyPair(random);
 
-            var certResponse = await SignAndStoreCertificateRequest(pkcs10CertificationRequest);
-            certResponse.Certificate.PrivateKey = rsaPrivateKey;
-            return certResponse;
-        }
+            var certificateDto = CreateCertificate(certificateDataToCreate, pair, random);
 
-        #endregion
+            var storeDto = GetPublicKeyDtoFromCert(certificateDto, pair);
+            var storedResult = await StorePublicKey(storeDto);
 
-        #region Methods for CSR
-
-        public async Task<CertificateTransactionResponse> SignAndStoreCertificateRequest(Pkcs10CertificationRequest signingRequest)
-        {
-            var payload = new CertificateRequestPayload(signingRequest);
-            var apiResult = await _remmeRest
-                .PutRequest<CertificateRequestPayload, CertificateResult>(
-                            RemmeMethodsEnum.CertificateStore,
-                            payload);
-
-            var result = new CertificateTransactionResponse(_remmeRest.SocketAddress);
-            result.BatchId = apiResult.BachId;
-            result.Certificate = GetCertificateFromPem(apiResult.CertificatePEM);
-
-            return result;
-        }
-
-        public Task<CertificateTransactionResponse> SignAndStoreCertificateRequest(string pemEncodedCSR)
-        {
-            return SignAndStoreCertificateRequest(GetBytesFromPemCsr(pemEncodedCSR));
-        }
-
-        public Task<CertificateTransactionResponse> SignAndStoreCertificateRequest(byte[] encodedCSR)
-        {
-            return SignAndStoreCertificateRequest(new Pkcs10CertificationRequest(encodedCSR));
+            return new CertificateTransactionResponse(_remmeRest.SocketAddress)
+            {
+                CertificateDto = certificateDto,
+                BatchId = storedResult.BatchId
+            };
         }
 
         #endregion
 
         #region Store Methods
 
-        public Task<CertificateTransactionResponse> StoreCertificate(SystemX509.X509Certificate2 certificate)
+        public async Task<BaseTransactionResponse> StorePublicKey(PublicKeyStoreDto publicKeyStoreDto)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<CertificateTransactionResponse> StoreCertificate(string pemEncodedCRT)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<CertificateTransactionResponse> StoreCertificate(byte[] encodedCRT)
-        {
+            /// TRANSACTION SHOULD BE CREATED AND SENT TO REMCHAIN
             throw new NotImplementedException();
         }
 
@@ -171,20 +145,16 @@ namespace REMME.Auth.Client.Implementation
         {
             var randomGenerator = new CryptoApiRandomGenerator();
             var random = new SecureRandom(randomGenerator);
-            var signatureFactory = new Asn1SignatureFactory("SHA512WITHRSA", keyPair.Private, random);
+            var signatureFactory = new Asn1SignatureFactory(_signatureAlgorithm, keyPair.Private, random);
             return new Pkcs10CertificationRequest(signatureFactory, subject, keyPair.Public, null, keyPair.Private);
         }
 
         private X509Name CreateSubject(CertificateCreateDto certificateDataToCreate)
         {
-            if (string.IsNullOrEmpty(certificateDataToCreate.CommonName))
-                throw new ArgumentException("'Common name' must have value");
-            if (certificateDataToCreate.Validity == 0)
-                throw new ArgumentException("'Validity' must have value");
-
             //TODO: Refactor this method to look better
             var attributes = new Dictionary<DerObjectIdentifier, string>();
             AddValueToSubject(attributes, X509Name.CN, certificateDataToCreate.CommonName);
+            AddValueToSubject(attributes, X509Name.O, certificateDataToCreate.OrganizationName);
             AddValueToSubject(attributes, X509Name.EmailAddress, certificateDataToCreate.Email);
             AddValueToSubject(attributes, X509Name.C, certificateDataToCreate.CountryName);
             AddValueToSubject(attributes, X509Name.L, certificateDataToCreate.LocalityName);
@@ -199,8 +169,47 @@ namespace REMME.Auth.Client.Implementation
             AddValueToSubject(attributes, X509Name.T, certificateDataToCreate.Title);
             AddValueToSubject(attributes, X509Name.SerialNumber, certificateDataToCreate.Serial);
             AddValueToSubject(attributes, X509Name.BusinessCategory, certificateDataToCreate.BusinessCategory);
-            
+
             return new X509Name(attributes.Keys.ToList(), attributes);
+        }
+
+        private CertificateDto CreateCertificate(CertificateCreateDto certificateCreateDto,
+                                                 AsymmetricCipherKeyPair rsaKeyPair,
+                                                 SecureRandom random)
+        {
+            ValidateCreateDto(certificateCreateDto);
+
+            var certificateGenerator = new X509V3CertificateGenerator();
+            var signatureFactory = new Asn1SignatureFactory(_signatureAlgorithm, rsaKeyPair.Private, random);
+            var serialNumber = BigIntegers.CreateRandomInRange(BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random);
+
+            var subject = CreateSubject(certificateCreateDto);
+            certificateGenerator.SetIssuerDN(subject);
+            certificateGenerator.SetSubjectDN(subject);
+            certificateGenerator.SetSerialNumber(serialNumber);
+            certificateGenerator.SetNotBefore(certificateCreateDto.NotBefore);
+            certificateGenerator.SetNotAfter(certificateCreateDto.NotAfter);
+            certificateGenerator.SetPublicKey(rsaKeyPair.Public);
+
+            var certificate = certificateGenerator.Generate(signatureFactory);
+            return new CertificateDto
+            {
+                Certificate = new SystemX509.X509Certificate2(certificate.GetEncoded()),
+                PrivateKeyDer = GetAsn1RsaPrivateKey(rsaKeyPair).GetDerEncoded(),
+                PublicKeyDer = GetAsn1RsaPublicKey(rsaKeyPair).GetDerEncoded()
+            };
+        }
+
+        private Asn1Object GetAsn1RsaPrivateKey(AsymmetricCipherKeyPair keyPair)
+        {
+            var privateKeyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(keyPair.Private);
+            return privateKeyInfo.ToAsn1Object();
+        }
+
+        private Asn1Object GetAsn1RsaPublicKey(AsymmetricCipherKeyPair keyPair)
+        {
+            var publicKeyInfo = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(keyPair.Public);
+            return publicKeyInfo.ToAsn1Object();
         }
 
         private void AddValueToSubject(Dictionary<DerObjectIdentifier, string> subject,
@@ -212,23 +221,21 @@ namespace REMME.Auth.Client.Implementation
                 subject.Add(identifier, value);
         }
 
-        private AsymmetricCipherKeyPair GenerateKeyPair()
+        private AsymmetricCipherKeyPair GenerateRsaKeyPair(SecureRandom random)
         {
-            var rsaKeyPairGenerator = new RsaKeyPairGenerator();
-            var genParam = new RsaKeyGenerationParameters
-                    (BigInteger.ValueOf(0x10001), new SecureRandom(), (int)1024, 128);
+            var keyGenerationParameters = new KeyGenerationParameters(random, _rsaKeySize);
+            var rsaKeyPairGnr = new RsaKeyPairGenerator();
+            rsaKeyPairGnr.Init(keyGenerationParameters);
 
-            rsaKeyPairGenerator.Init(genParam);
-            return rsaKeyPairGenerator.GenerateKeyPair();
+            return rsaKeyPairGnr.GenerateKeyPair();
         }
 
-        public static AsymmetricCipherKeyPair GetKeyPairWithDotNet()
+        private void ValidateCreateDto(CertificateCreateDto certificateCreateDto)
         {
-            using (RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider(_rsaKeySize))
-            {
-                RSAParameters rsaKeyInfo = rsaProvider.ExportParameters(true);
-                return DotNetUtilities.GetRsaKeyPair(rsaKeyInfo);
-            }
+            if (string.IsNullOrEmpty(certificateCreateDto.CommonName))
+                throw new ArgumentException("'Common name' must have value");
+            if (certificateCreateDto.ValidityDays == 0)
+                throw new ArgumentException("'Validity' must have value");
         }
 
         private byte[] GetBytesFromPemCsr(string pemCsr)
@@ -245,6 +252,64 @@ namespace REMME.Auth.Client.Implementation
                 .Replace("-----BEGIN CERTIFICATE-----", "")
                 .Replace("-----END CERTIFICATE-----", "");
             return new SystemX509.X509Certificate2(Convert.FromBase64String(pemString));
+        }
+
+        private byte[] GetCertificateHash(SystemX509.X509Certificate2 certificate)
+        {
+            return certificate
+                        .Export(SystemX509.X509ContentType.Cert)
+                        .Sha512Digest();
+        }
+
+        private string PublicKeyToPem(byte[] key)
+        {
+            return string.Format(
+                "-----BEGIN PUBLIC KEY-----\n{0}\n-----END PUBLIC KEY-----",
+                Convert.ToBase64String(key));
+        }
+
+        private byte[] SignHashWithKey(AsymmetricCipherKeyPair keyPair, byte[] data)
+        {
+            var keyParams = (RsaPrivateCrtKeyParameters)keyPair.Private;
+            RSAParameters rsaParameters = new RSAParameters();
+
+            rsaParameters.Modulus = keyParams.Modulus.ToByteArrayUnsigned();
+            rsaParameters.P = keyParams.P.ToByteArrayUnsigned();
+            rsaParameters.Q = keyParams.Q.ToByteArrayUnsigned();
+            rsaParameters.DP = keyParams.DP.ToByteArrayUnsigned();
+            rsaParameters.DQ = keyParams.DQ.ToByteArrayUnsigned();
+            rsaParameters.InverseQ = keyParams.QInv.ToByteArrayUnsigned();
+            rsaParameters.D = keyParams.Exponent.ToByteArrayUnsigned();
+            rsaParameters.Exponent = keyParams.PublicExponent.ToByteArrayUnsigned();
+
+            RSACryptoServiceProvider rsaKey = new RSACryptoServiceProvider(_rsaKeySize);
+            rsaKey.ImportParameters(rsaParameters);
+
+            return rsaKey.SignHash(data, "SHA512");
+        }
+
+        private uint GetUnixTime(DateTime dateTime)
+        {            
+            return (uint)(dateTime.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        }
+
+        private PublicKeyStoreDto GetPublicKeyDtoFromCert(CertificateDto certificateDto, AsymmetricCipherKeyPair pair)
+        {
+            var certHash = GetCertificateHash(certificateDto.Certificate);
+            var hashSignature = SignHashWithKey(pair, certHash);
+            var exponent = ((RsaPrivateCrtKeyParameters)pair.Private).PublicExponent.LongValue;
+            return new PublicKeyStoreDto
+            {
+                EntityHash = certHash.BytesToHexString(),
+                EntityHashSignature = hashSignature.BytesToHexString(),
+                EntityOwnerType = EntityOwnerTypeEnum.Personal,
+                PublicKeyType = PublicKeyTypeEnum.RSA,
+                PublicKeyPem = PublicKeyToPem(certificateDto.PublicKeyDer),
+                RsaKeySize = _rsaKeySize,
+                RsaPublicExponent = exponent,
+                ValidityFrom = GetUnixTime(certificateDto.Certificate.NotBefore),
+                ValidityTo = GetUnixTime(certificateDto.Certificate.NotAfter)
+            };
         }
 
         #endregion

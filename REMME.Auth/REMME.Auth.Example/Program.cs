@@ -9,11 +9,13 @@ namespace REMME.Auth.Example
         static void Main(string[] args)
         {
             //Addresses of Docker container ports
-            string nodeAddress = "192.168.99.101:8080";
-            string socketAddress = "192.168.99.101:9080";
+            string nodeAddress = "192.168.99.100:8080";
+            string socketAddress = "192.168.99.100:9080";
+
+            var privateKeyHex = "78a8f39be4570ba8dbb9b87e6918a4c2559bc4e8f3206a0a755c6f2b659a7850";
 
             //Initialize client
-            var client = new RemmeClient(nodeAddress, socketAddress);
+            var client = new RemmeClient(privateKeyHex, nodeAddress, socketAddress);
 
             //Token Operations
             var someRemmeAddress = "0306796698d9b14a0ba313acc7fb14f69d8717393af5b02cc292d72009b97d8759";
@@ -23,12 +25,15 @@ namespace REMME.Auth.Example
             var transactionResult = client.Token.Transfer(someRemmeAddress, 100).Result;
             Console.WriteLine("Sending tokens...BatchId: {0}", transactionResult.BatchId);
 
-            transactionResult.BatchConfirmed += (sender, e) =>
+            transactionResult.OnREMChainMessage += (sender, e) =>
             {
-                Console.WriteLine("Tokens were sent at block number: ", e.BlockNumber);
+                if(e.Status == Client.RemmeApi.Models.BatchStatusEnum.OK)
+                {
+                    Console.WriteLine("Tokens were sent");
 
-                var newBalance = client.Token.GetBalance(someRemmeAddress).Result;
-                Console.WriteLine("Account {0} balance - {1} REM", someRemmeAddress, newBalance);
+                    var newBalance = client.Token.GetBalance(someRemmeAddress).Result;
+                    Console.WriteLine("Account {0} balance - {1} REM", someRemmeAddress, newBalance);
+                }
                 transactionResult.CloseWebSocket();
             };
 
@@ -39,7 +44,7 @@ namespace REMME.Auth.Example
 
             var certificateTransactioResult = client
                                                 .Certificate
-                                                .CreateAndStoreCertificate(
+                                                .CreateAndStore(
                                                     new CertificateCreateDto
                                                     {
                                                         CommonName = "userName1",
@@ -47,20 +52,24 @@ namespace REMME.Auth.Example
                                                         Name = "John",
                                                         Surname = "Smith",
                                                         CountryName = "US",                
-                                                        Validity = 360
+                                                        ValidityDays = 360
                                                     }).Result;
             Console.WriteLine("Issuing certificate... BatchId: ", certificateTransactioResult.BatchId);
-            certificateTransactioResult.BatchConfirmed += (sender, e) =>
+            certificateTransactioResult.OnREMChainMessage += (sender, e) =>
             {
-                Console.WriteLine("Certificate was saved on REMchain at block number: ", e.BlockNumber);
+                if(e.Status == Client.RemmeApi.Models.BatchStatusEnum.OK)
+                {
+                    Console.WriteLine("Certificate was saved on REMchain");
 
-                var certificateStatus = client
-                                            .Certificate
-                                            .CheckCertificate(certificateTransactioResult.Certificate).Result;
-                Console.WriteLine("Certificate IsValid = {0}", certificateStatus);
+                    var certificateStatus = client
+                            .Certificate
+                            .CheckCertificate(certificateTransactioResult.CertificateDto.Certificate).Result;
+                    Console.WriteLine("Certificate IsValid = {0}", certificateStatus);
 
-                // In this place additional logic can be stored. 
-                // FI, saving user identifier to DataBase, or creating user account
+                    // In this place additional logic can be stored. 
+                    // FI, saving user identifier to DataBase, or creating user account
+                }
+
 
                 certificateTransactioResult.CloseWebSocket();
             };

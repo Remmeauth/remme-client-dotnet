@@ -9,6 +9,6 @@ namespace REMME.Auth.Client.Contracts.Models
         {
         }
 
-        public X509Certificate2 Certificate { get; set; }
+        public CertificateDto CertificateDto { get; set; }
     }
 }

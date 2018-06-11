@@ -104,7 +104,7 @@ namespace REMME.Auth.Client.Crypto
 
         private byte[] PrivateKeyToBytes()
         {
-            return _privateKey.ToByteArray().Skip(1).ToArray();
+            return _privateKey.ToByteArray();
         }
 
         #endregion

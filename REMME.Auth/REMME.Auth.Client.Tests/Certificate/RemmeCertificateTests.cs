@@ -7,6 +7,7 @@ using Org.BouncyCastle.Crypto.Operators;
 using Org.BouncyCastle.Crypto.Prng;
 using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
+using REMME.Auth.Client.Contracts;
 using REMME.Auth.Client.Contracts.Exceptions;
 using REMME.Auth.Client.Contracts.Models;
 using REMME.Auth.Client.Implementation;
@@ -30,10 +31,10 @@ namespace REMME.Auth.Client.Tests.Certificate
         {    
             // Arrange
             var certificateDto = new CertificateCreateDto();
-            var certificate = new RemmeCertificate(new Mock<IRemmeRest>().Object);
+            var certificate = new RemmeCertificate(new Mock<IRemmeRest>().Object, new Mock<IRemmeTransactionService>().Object);
             
             //Assert
-            Assert.That(() => certificate.CreateAndStoreCertificate(certificateDto),
+            Assert.That(() => certificate.CreateAndStore(certificateDto),
                         Throws.TypeOf<ArgumentException>());
         }
 
@@ -42,169 +43,13 @@ namespace REMME.Auth.Client.Tests.Certificate
         {
             // Arrange
             var certificateDto = new CertificateCreateDto() { CommonName = "name"};
-            var certificate = new RemmeCertificate(new Mock<IRemmeRest>().Object);
+            var certificate = new RemmeCertificate(new Mock<IRemmeRest>().Object, new Mock<IRemmeTransactionService>().Object);
 
             //Assert
-            Assert.That(() => certificate.CreateAndStoreCertificate(certificateDto),
+            Assert.That(() => certificate.CreateAndStore(certificateDto),
                         Throws.TypeOf<ArgumentException>());
         }
-
-        [Test]
-        public void SignAndStoreCertificateRequest_ValidDataProvided_BatchIdReturned()
-        {
-            // Arrange
-            var certificateDto = GetMockCertificateDto();
-            var csr = GetMockCertificateRequest(certificateDto);
-            var mockPem = GetMockPEMCertificate();
-            var mock = GetMockRestSignCertificate(mockPem, MOCK_BATCH_ID);
-
-            var certificate = new RemmeCertificate(mock.Object);
-
-            //Act
-            var actualTransactionResult = certificate.SignAndStoreCertificateRequest(csr).Result;
-
-            //Assert
-            Assert.AreEqual(actualTransactionResult.BatchId, MOCK_BATCH_ID, "Transaction result object should contain valid batch id");
-        }
-
-        [Test]
-        public void SignAndStoreCertificateRequest_ValidDataProvided_ValidCertificateSubjectCreated()
-        {
-            // Arrange
-            var certificateDto = GetMockCertificateDto();
-            var csr = GetMockCertificateRequest(certificateDto);
-            var mockPem = GetMockPEMCertificate();
-            var mock = GetMockRestSignCertificate(mockPem, MOCK_BATCH_ID);
-            var expectedSubject = GetMockSubject();
-
-            var certificate = new RemmeCertificate(mock.Object);
-
-            //Act
-            var actualTransactionResult = certificate.SignAndStoreCertificateRequest(csr).Result;
-
-            //Assert
-
-            Assert.AreEqual(actualTransactionResult.Certificate.Subject,
-                            expectedSubject, 
-                            "Created certificate should contain valid subject");
-        }
-
-        [Test]
-        public void SignAndStoreCertificateRequest_RemmeRestException_ExceptionThrown()
-        {
-            // Arrange
-            var mock = new Mock<IRemmeRest>();
-            var certificateDto = GetMockCertificateDto();
-            var csr = GetMockCertificateRequest(certificateDto);
-            mock.Setup(a => a.PutRequest<CertificateRequestPayload, CertificateResult>
-                   (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.CertificateStore == t), It.IsAny<CertificateRequestPayload>()))
-               .Throws(new RemmeNodeException(MOCK_EXCEPTION_MESSAGE));
-
-            var certificate = new RemmeCertificate(mock.Object);
-
-            // Assert
-            Assert.That(() => certificate.SignAndStoreCertificateRequest(csr),
-                        Throws.TypeOf<RemmeNodeException>());
-        }
-
-        [Test]
-        public void SignAndStoreCertificateRequest_RemmeConnectionException_ExceptionThrown()
-        {
-            // Arrange
-            var mock = new Mock<IRemmeRest>();
-            var certificateDto = GetMockCertificateDto();
-            var csr = GetMockCertificateRequest(certificateDto);
-            mock.Setup(a => a.PutRequest<CertificateRequestPayload, CertificateResult>
-                   (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.CertificateStore == t), It.IsAny<CertificateRequestPayload>()))
-               .Throws(new RemmeConnectionException(MOCK_EXCEPTION_MESSAGE));
-
-            var certificate = new RemmeCertificate(mock.Object);
-
-            // Assert
-            Assert.That(() => certificate.SignAndStoreCertificateRequest(csr),
-                        Throws.TypeOf<RemmeConnectionException>());
-        }
-
-        [Test]
-        public void SignAndStoreCertificateRequest_ValidByteDataProvided_BatchIdReturned()
-        {
-            // Arrange
-            var certificateDto = GetMockCertificateDto();
-            var csr = GetMockCertificateRequest(certificateDto);            
-            var mockPem = GetMockPEMCertificate();
-            var mock = GetMockRestSignCertificate(mockPem, MOCK_BATCH_ID);
-
-            var certificate = new RemmeCertificate(mock.Object);
-
-            //Act
-            var actualTransactionResult = certificate.SignAndStoreCertificateRequest(csr.GetEncoded()).Result;
-
-            //Assert
-            Assert.AreEqual(actualTransactionResult.BatchId, MOCK_BATCH_ID, "Transaction result object should contain valid batch id");
-        }
-
-        [Test]
-        public void SignAndStoreCertificateRequest_ValidByteDataProvided_ValidCertificateSubjectCreated()
-        {
-            // Arrange
-            var certificateDto = GetMockCertificateDto();
-            var csr = GetMockCertificateRequest(certificateDto);
-            var mockPem = GetMockPEMCertificate();
-            var mock = GetMockRestSignCertificate(mockPem, MOCK_BATCH_ID);
-            var expectedSubject = GetMockSubject();
-
-            var certificate = new RemmeCertificate(mock.Object);
-
-            //Act
-            var actualTransactionResult = certificate.SignAndStoreCertificateRequest(csr.GetEncoded()).Result;
-
-            //Assert
-
-            Assert.AreEqual(actualTransactionResult.Certificate.Subject,
-                            expectedSubject,
-                            "Created certificate should contain valid subject");
-        }
-
-        [Test]
-        public void SignAndStoreCertificateRequest_ValidPemDataProvided_BatchIdReturned()
-        {
-            // Arrange
-            var certificateDto = GetMockCertificateDto();
-            var csr = GetMockCertificateRequest(certificateDto);
-            var mockPem = GetMockPEMCertificate();
-            var mock = GetMockRestSignCertificate(mockPem, MOCK_BATCH_ID);
-
-            var certificate = new RemmeCertificate(mock.Object);
-
-            //Act
-            var actualTransactionResult = certificate.SignAndStoreCertificateRequest(ConvertCsrToPem(csr)).Result;
-
-            //Assert
-            Assert.AreEqual(actualTransactionResult.BatchId, MOCK_BATCH_ID, "Transaction result object should contain valid batch id");
-        }
-
-        [Test]
-        public void SignAndStoreCertificateRequest_ValidPemDataProvided_ValidCertificateSubjectCreated()
-        {
-            // Arrange
-            var certificateDto = GetMockCertificateDto();
-            var csr = GetMockCertificateRequest(certificateDto);
-            var mockPem = GetMockPEMCertificate();
-            var mock = GetMockRestSignCertificate(mockPem, MOCK_BATCH_ID);
-            var expectedSubject = GetMockSubject();
-
-            var certificate = new RemmeCertificate(mock.Object);
-
-            //Act
-            var actualTransactionResult = certificate.SignAndStoreCertificateRequest(ConvertCsrToPem(csr)).Result;
-
-            //Assert
-
-            Assert.AreEqual(actualTransactionResult.Certificate.Subject,
-                            expectedSubject,
-                            "Created certificate should contain valid subject");
-        }
-
+        
         [Test]
         public void CheckCertificate_ValidPemDataProvided_StatusReturned()
         {
@@ -215,13 +60,13 @@ namespace REMME.Auth.Client.Tests.Certificate
                     (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.Certificate == t), It.IsAny<CertificatePayload>()))
                     .ReturnsAsync(new CertificateCheckResult() { IsRevoked = isRevoked });
 
-            var certificate = new RemmeCertificate(mock.Object);
+            var certificate = new RemmeCertificate(mock.Object, new Mock<IRemmeTransactionService>().Object);
 
             //Act
             var actualCheckResult = certificate.CheckCertificate(GetMockX509CertPem()).Result;
 
             //Assert
-            Assert.AreEqual(actualCheckResult, !isRevoked, "Certificate status must be returned");
+            Assert.AreEqual(actualCheckResult, !isRevoked, "CertificateDto status must be returned");
         }
 
         //This test will fail until BatchId will be implemented at REMME REST Revoke
@@ -235,7 +80,7 @@ namespace REMME.Auth.Client.Tests.Certificate
                     (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.Certificate == t), It.IsAny<CertificatePayload>()))
                     .ReturnsAsync(new CertificateResult() { BachId = MOCK_BATCH_ID });
 
-            var certificate = new RemmeCertificate(mock.Object);
+            var certificate = new RemmeCertificate(mock.Object, new Mock<IRemmeTransactionService>().Object);
 
             //Act
             var actualCheckResult = certificate.Revoke(GetMockX509CertPem()).Result;
@@ -308,7 +153,7 @@ namespace REMME.Auth.Client.Tests.Certificate
                 Name = "John",
                 Surname = "Smith",
                 CountryName = "US",
-                Validity = 360
+                ValidityDays = 360
             };
         }
 

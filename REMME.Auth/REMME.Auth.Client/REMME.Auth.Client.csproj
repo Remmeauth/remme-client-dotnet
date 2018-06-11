@@ -61,9 +61,13 @@
     <Compile Include="Contracts\IRemmeBatch.cs" />
     <Compile Include="Contracts\IRemmeTransactionService.cs" />
     <Compile Include="Contracts\Models\CertificateCreateDto.cs" />
+    <Compile Include="Contracts\Models\CertificateDto.cs" />
     <Compile Include="Contracts\Models\CertificateTransactionResponse.cs" />
     <Compile Include="Contracts\IRemmeCertificate.cs" />
     <Compile Include="Contracts\IRemmeToken.cs" />
+    <Compile Include="Contracts\Models\PyblicKeyStore\EntityOwnerTypeEnum.cs" />
+    <Compile Include="Contracts\Models\PyblicKeyStore\PublicKeyTypeEnum.cs" />
+    <Compile Include="Contracts\Models\PyblicKeyStore\PublicKeyStoreDto.cs" />
     <Compile Include="Contracts\Models\TransactionCreateDto.cs" />
     <Compile Include="Implementation\RemmeAccount.cs" />
     <Compile Include="Crypto\DeterministicECDSA.cs" />
