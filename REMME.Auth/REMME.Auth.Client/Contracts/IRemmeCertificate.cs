@@ -1,6 +1,5 @@
-﻿using Org.BouncyCastle.Pkcs;
-using REMME.Auth.Client.Contracts.Models;
-using REMME.Auth.Client.Contracts.Models.PyblicKeyStore;
+﻿using REMME.Auth.Client.Contracts.Models;
+using REMME.Auth.Client.Contracts.Models.PublicKeyStore;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;

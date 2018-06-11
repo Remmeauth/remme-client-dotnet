@@ -6,6 +6,7 @@ using REMME.Auth.Client.RemmeApi;
 using REMME.Auth.Client.RemmeApi.Models;
 using REMME.Auth.Client.RemmeApi.Models.Proto;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace REMME.Auth.Client.Implementation
@@ -81,6 +82,23 @@ namespace REMME.Auth.Client.Implementation
         {
             var result = await _remmeRest.GetRequest<NodeKeyResult>(RemmeMethodsEnum.NodePublicKey);        
             return result.NodePublicKey;
+        }
+
+        public TransactionCreateDto GenerateTransactionDto(TransactionPayload remmeTransaction, List<string> inputsOutputs, string familyName, string familyVersion)
+        {
+            return new TransactionCreateDto
+            {
+                FamilyName = familyName,
+                FamilyVersion = familyVersion,
+                Inputs = inputsOutputs,
+                Outputs = inputsOutputs,
+                Payload = remmeTransaction.ToByteString()
+            };
+        }
+
+        public List<string> GetDataInputOutput(string dataAddress)
+        {
+            return new List<string> { dataAddress, SignerAddress };
         }
 
         #endregion

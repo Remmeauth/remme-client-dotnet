@@ -12,6 +12,8 @@ namespace REMME.Auth.Client.Contracts.Models
     public class CertificateDto
     {
         public X509Certificate2 Certificate { get; set; }
+        
+        public string CertificatePEM { get => GetPemCertificate();  }
 
         public AsymmetricCipherKeyPair KeyPair { get; set; }
 
@@ -38,6 +40,12 @@ namespace REMME.Auth.Client.Contracts.Models
         }
 
         #region Privates
+
+        private string GetPemCertificate()
+        {
+            return string.Format("-----BEGIN CERTIFICATE-----\n{0}\n-----END CERTIFICATE-----",
+                                Convert.ToBase64String(Certificate.Export(X509ContentType.Cert)));
+        }
 
         private RSACryptoServiceProvider GetCryptoServiceProvider()
         {

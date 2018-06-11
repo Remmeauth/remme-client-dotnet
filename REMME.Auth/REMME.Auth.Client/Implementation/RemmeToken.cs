@@ -40,8 +40,12 @@ namespace REMME.Auth.Client.Implementation
 
             var transferProto = GenerateTransferPayload(publicKeyTo, amount);
             var remmeTransaction = GenerateRemmeTransaction(transferProto);
-            var transactionDto = GenerateTransactionDto(remmeTransaction,
-                                                        GetTransferInputOutput(transferProto.AddressTo));
+            var inputsOutputs = _remmeTransactionService.GetDataInputOutput(transferProto.AddressTo);
+            var transactionDto = _remmeTransactionService.GenerateTransactionDto(
+                                                                remmeTransaction,
+                                                                inputsOutputs, 
+                                                                FAMILY_NAME, 
+                                                                FAMILY_VERSION);
 
             var resultTrans = await _remmeTransactionService.CreateTransaction(transactionDto);
 
@@ -49,18 +53,6 @@ namespace REMME.Auth.Client.Implementation
         }
 
         #region Private Helpers
-
-        private TransactionCreateDto GenerateTransactionDto(TransactionPayload remmeTransaction, List<string> inputsOutputs)
-        {
-            return new TransactionCreateDto
-            {
-                FamilyName = FAMILY_NAME,
-                FamilyVersion = FAMILY_VERSION,
-                Inputs = inputsOutputs,
-                Outputs = inputsOutputs,
-                Payload = remmeTransaction.ToByteString()
-            };
-        }
 
         private TransactionPayload GenerateRemmeTransaction(TransferPayload transferPayload)
         {
@@ -71,10 +63,7 @@ namespace REMME.Auth.Client.Implementation
             };
         }
 
-        private List<string> GetTransferInputOutput(string addressTo)
-        {
-            return new List<string> { addressTo, _remmeTransactionService.SignerAddress };
-        }
+
 
         private TransferPayload GenerateTransferPayload(string publicKeyTo, ulong amount)
         {            

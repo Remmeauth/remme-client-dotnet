@@ -15,19 +15,23 @@ using REMME.Auth.Client.Contracts.Models;
 using REMME.Auth.Client.RemmeApi;
 using Org.BouncyCastle.Crypto.Operators;
 using Org.BouncyCastle.Crypto.Prng;
-using System.Security.Cryptography;
 using SystemX509 = System.Security.Cryptography.X509Certificates;
 using REMME.Auth.Client.RemmeApi.Models;
 using REMME.Auth.Client.RemmeApi.Models.Certificate;
 using Org.BouncyCastle.X509;
 using Org.BouncyCastle.Utilities;
-using REMME.Auth.Client.Contracts.Models.PyblicKeyStore;
 using REMME.Auth.Client.Crypto;
+using REMME.Auth.Client.Contracts.Models.PublicKeyStore;
+using REMME.Auth.Client.RemmeApi.Models.Proto;
+using Google.Protobuf;
+using System.Security.Cryptography.X509Certificates;
 
 namespace REMME.Auth.Client.Implementation
 {
     public class RemmeCertificate : IRemmeCertificate
     {
+        private const string FAMILY_NAME = "certificate";
+        private const string FAMILY_VERSION = "0.1";
         private readonly IRemmeRest _remmeRest;
         private readonly IRemmeTransactionService _remmeTransactionService;
 
@@ -107,24 +111,30 @@ namespace REMME.Auth.Client.Implementation
         //when block will be writen to REMCHain with revoke data
         public async Task<BaseTransactionResponse> Revoke(SystemX509.X509Certificate2 certificate)
         {
-            var payload = new CertificatePayload(certificate);
-
-            var result = await _remmeRest
-                .DeleteRequest<CertificatePayload, CertificateResult>(
-                            RemmeMethodsEnum.Certificate,
-                            payload);
-
-            return new BaseTransactionResponse(_remmeRest.SocketAddress);
+            return await Revoke(certificate.Export(X509ContentType.Cert));
         }
 
-        public Task<BaseTransactionResponse> Revoke(string pemEncodedCRT)
+        public async Task<BaseTransactionResponse> Revoke(string pemEncodedCRT)
         {
-            return Revoke(GetCertificateFromPem(pemEncodedCRT));
+            var revokeProto = GenerateRevokePayload(pemEncodedCRT);
+            var remmeTransaction = GenerateRevokeRemmeTransaction(revokeProto);
+            var inputsOutputs = _remmeTransactionService.GetDataInputOutput(revokeProto.Address);
+            var transactionDto = _remmeTransactionService.GenerateTransactionDto(
+                                                                remmeTransaction,
+                                                                inputsOutputs,
+                                                                FAMILY_NAME,
+                                                                FAMILY_VERSION);
+
+            var resultTrans = await _remmeTransactionService.CreateTransaction(transactionDto);
+
+            return await _remmeTransactionService.SendTransaction(resultTrans);
         }
 
-        public Task<BaseTransactionResponse> Revoke(byte[] encodedCRT)
+        public async Task<BaseTransactionResponse> Revoke(byte[] encodedCRT)
         {
-            return Revoke(new SystemX509.X509Certificate2(encodedCRT));
+            var pemData = string.Format("-----BEGIN CERTIFICATE-----\n{0}\n-----END CERTIFICATE-----",
+                                    Convert.ToBase64String(encodedCRT));
+            return await Revoke(pemData);
         }
 
         #endregion
@@ -225,28 +235,13 @@ namespace REMME.Auth.Client.Implementation
                 throw new ArgumentException("'Validity' must have value");
         }
 
-        private byte[] GetBytesFromPemCsr(string pemCsr)
-        {
-            var pemString = pemCsr
-                .Replace("-----BEGIN CERTIFICATE REQUEST-----", "")
-                .Replace("-----END CERTIFICATE REQUEST-----", "");
-            return Convert.FromBase64String(pemString);
-        }
-
         private SystemX509.X509Certificate2 GetCertificateFromPem(string pemCertificate)
         {
             var pemString = pemCertificate
                 .Replace("-----BEGIN CERTIFICATE-----", "")
                 .Replace("-----END CERTIFICATE-----", "");
             return new SystemX509.X509Certificate2(Convert.FromBase64String(pemString));
-        }
-
-        private byte[] GetCertificateHash(SystemX509.X509Certificate2 certificate)
-        {
-            return certificate
-                        .Export(SystemX509.X509ContentType.Cert)
-                        .Sha512Digest();
-        }
+        }        
 
         private string PublicKeyToPem(byte[] key)
         {
@@ -262,7 +257,7 @@ namespace REMME.Auth.Client.Implementation
 
         private PublicKeyStoreDto GetPublicKeyDtoFromCert(CertificateDto certificateDto, AsymmetricCipherKeyPair pair)
         {
-            var certHash = GetCertificateHash(certificateDto.Certificate);
+            var certHash = certificateDto.CertificatePEM.Sha512Digest();
             var hashSignature = certificateDto.SystemRSAKey.SignHash(certHash, "SHA512");
             var exponent = ((RsaPrivateCrtKeyParameters)pair.Private).PublicExponent.LongValue;
             return new PublicKeyStoreDto
@@ -279,6 +274,23 @@ namespace REMME.Auth.Client.Implementation
             };
         }
 
+        private RevokeCertificatePayload GenerateRevokePayload(string certificatePem)
+        {
+            return new RevokeCertificatePayload
+            {
+                Address = Utils.GetAddressFromData(certificatePem, FAMILY_NAME)
+            };
+        }
+
+        private TransactionPayload GenerateRevokeRemmeTransaction(RevokeCertificatePayload revokePayload)
+        {
+            return new TransactionPayload
+            {
+                Method = 1,
+                Data = revokePayload.ToByteString()
+            };
+        }
+        
         #endregion
     }
 }
