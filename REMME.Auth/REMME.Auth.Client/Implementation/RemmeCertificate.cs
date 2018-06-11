@@ -195,21 +195,8 @@ namespace REMME.Auth.Client.Implementation
             return new CertificateDto
             {
                 Certificate = new SystemX509.X509Certificate2(certificate.GetEncoded()),
-                PrivateKeyDer = GetAsn1RsaPrivateKey(rsaKeyPair).GetDerEncoded(),
-                PublicKeyDer = GetAsn1RsaPublicKey(rsaKeyPair).GetDerEncoded()
+                KeyPair = rsaKeyPair
             };
-        }
-
-        private Asn1Object GetAsn1RsaPrivateKey(AsymmetricCipherKeyPair keyPair)
-        {
-            var privateKeyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(keyPair.Private);
-            return privateKeyInfo.ToAsn1Object();
-        }
-
-        private Asn1Object GetAsn1RsaPublicKey(AsymmetricCipherKeyPair keyPair)
-        {
-            var publicKeyInfo = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(keyPair.Public);
-            return publicKeyInfo.ToAsn1Object();
         }
 
         private void AddValueToSubject(Dictionary<DerObjectIdentifier, string> subject,
@@ -268,26 +255,6 @@ namespace REMME.Auth.Client.Implementation
                 Convert.ToBase64String(key));
         }
 
-        private byte[] SignHashWithKey(AsymmetricCipherKeyPair keyPair, byte[] data)
-        {
-            var keyParams = (RsaPrivateCrtKeyParameters)keyPair.Private;
-            RSAParameters rsaParameters = new RSAParameters();
-
-            rsaParameters.Modulus = keyParams.Modulus.ToByteArrayUnsigned();
-            rsaParameters.P = keyParams.P.ToByteArrayUnsigned();
-            rsaParameters.Q = keyParams.Q.ToByteArrayUnsigned();
-            rsaParameters.DP = keyParams.DP.ToByteArrayUnsigned();
-            rsaParameters.DQ = keyParams.DQ.ToByteArrayUnsigned();
-            rsaParameters.InverseQ = keyParams.QInv.ToByteArrayUnsigned();
-            rsaParameters.D = keyParams.Exponent.ToByteArrayUnsigned();
-            rsaParameters.Exponent = keyParams.PublicExponent.ToByteArrayUnsigned();
-
-            RSACryptoServiceProvider rsaKey = new RSACryptoServiceProvider(_rsaKeySize);
-            rsaKey.ImportParameters(rsaParameters);
-
-            return rsaKey.SignHash(data, "SHA512");
-        }
-
         private uint GetUnixTime(DateTime dateTime)
         {            
             return (uint)(dateTime.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
@@ -296,7 +263,7 @@ namespace REMME.Auth.Client.Implementation
         private PublicKeyStoreDto GetPublicKeyDtoFromCert(CertificateDto certificateDto, AsymmetricCipherKeyPair pair)
         {
             var certHash = GetCertificateHash(certificateDto.Certificate);
-            var hashSignature = SignHashWithKey(pair, certHash);
+            var hashSignature = certificateDto.SystemRSAKey.SignHash(certHash, "SHA512");
             var exponent = ((RsaPrivateCrtKeyParameters)pair.Private).PublicExponent.LongValue;
             return new PublicKeyStoreDto
             {
