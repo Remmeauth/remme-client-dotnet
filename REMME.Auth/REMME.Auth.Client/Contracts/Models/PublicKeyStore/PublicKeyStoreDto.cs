@@ -1,4 +1,4 @@
-﻿namespace REMME.Auth.Client.Contracts.Models.PyblicKeyStore
+﻿namespace REMME.Auth.Client.Contracts.Models.PublicKeyStore
 {
     public class PublicKeyStoreDto
     {
