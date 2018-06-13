@@ -9,5 +9,7 @@
         IRemmeAccount Account { get; }
 
         IRemmeBatch Batch { get; }
+
+        IRemmePublicKeyStorage PublicKeyStorage { get; }
     }
 }

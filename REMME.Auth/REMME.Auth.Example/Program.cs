@@ -63,8 +63,8 @@ namespace REMME.Auth.Example
 
                     var certificateStatus = client
                             .Certificate
-                            .CheckCertificate(certificateTransactioResult.CertificateDto.Certificate).Result;
-                    Console.WriteLine("Certificate IsValid = {0}", certificateStatus);
+                            .Check(certificateTransactioResult.CertificateDto.Certificate).Result;
+                    Console.WriteLine("Certificate IsValid = {0}", certificateStatus.IsValid);
 
                     // In this place additional logic can be stored. 
                     // FI, saving user identifier to DataBase, or creating user account

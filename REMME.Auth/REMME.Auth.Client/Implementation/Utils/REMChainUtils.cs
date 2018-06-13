@@ -1,10 +1,9 @@
-﻿using REMME.Auth.Client.Crypto;
-using System;
+﻿using System;
 using System.Linq;
 
-namespace REMME.Auth.Client.Implementation
+namespace REMME.Auth.Client.Implementation.Utils
 {
-    public class Utils
+    public class REMChainUtils
     {
         public static string GetAddressFromData(string data, string familyName)
         {

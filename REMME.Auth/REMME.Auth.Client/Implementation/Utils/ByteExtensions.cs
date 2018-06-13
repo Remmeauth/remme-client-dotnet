@@ -5,7 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace REMME.Auth.Client.Crypto
+namespace REMME.Auth.Client.Implementation.Utils
 {
     public static class ByteExtensions
     {

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace REMME.Auth.Client.RemmeApi.Models
 {
@@ -22,18 +23,27 @@ namespace REMME.Auth.Client.RemmeApi.Models
 
     public class BatchStatus
     {
-        public BatchStatusEnum Status { get => StatusString == "OK" ? BatchStatusEnum.OK : BatchStatusEnum.NOT_CONFIRMED; }
+        public BatchStatusEnum Status { get => GetStatusFromString(); }
 
         [JsonProperty("status")]
         public string StatusString { get; set; }
 
         [JsonProperty("batch_id")]
         public string BatchId { get; set; }
+
+        private BatchStatusEnum GetStatusFromString()
+        {
+            var batchStatusEnum = BatchStatusEnum.NOT_CONFIRMED;
+            Enum.TryParse<BatchStatusEnum>(StatusString, out batchStatusEnum);
+
+            return batchStatusEnum;
+        }
     }
 
     public enum BatchStatusEnum
     {
         NOT_CONFIRMED,
-        OK
+        OK,
+        PENDING
     }
 }

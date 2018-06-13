@@ -52,7 +52,8 @@ namespace REMME.Auth.Client.Implementation
             _remmeRest = new RemmeRest(nodeAddress, socketAddress);
             Account = remmeAccount;
             _remmeTransactionService = new RemmeTransactionService(Account, _remmeRest);
-            Certificate = new RemmeCertificate(_remmeRest, _remmeTransactionService);
+            PublicKeyStorage = new RemmePublicKeyStorage(_remmeRest, _remmeTransactionService);
+            Certificate = new RemmeCertificate(PublicKeyStorage);
             Token = new RemmeToken(_remmeRest, _remmeTransactionService);
             Batch = new RemmeBatch(_remmeRest);
         }
@@ -61,6 +62,7 @@ namespace REMME.Auth.Client.Implementation
         public IRemmeToken Token { get; private set; }
         public IRemmeAccount Account { get; private set; }
         public IRemmeBatch Batch { get; private set; }
+        public IRemmePublicKeyStorage PublicKeyStorage { get; private set; }
 
         /// <summary>
         /// Genarates new Remme Account

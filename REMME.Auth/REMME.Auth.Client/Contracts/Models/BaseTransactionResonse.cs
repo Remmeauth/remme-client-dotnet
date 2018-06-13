@@ -9,13 +9,13 @@ namespace REMME.Auth.Client.Contracts.Models
     public class BaseTransactionResponse : ITransactionResponse
     {
         private WebSocket _webSocket;
-        private string _socketAddress;
 
         public BaseTransactionResponse(string socketAddress)
         {
-            _socketAddress = socketAddress;
+            SocketAddress = socketAddress;
         }
 
+        public string SocketAddress { get; set; }
         public string BatchId { get; set; }
 
         public event EventHandler<BatchStatus> OnREMChainMessage;
@@ -60,7 +60,7 @@ namespace REMME.Auth.Client.Contracts.Models
 
         private string GetSubscribeUrl()
         {
-            return string.Format("ws://{0}/ws", _socketAddress);
+            return string.Format("ws://{0}/ws", SocketAddress);
         }
 
         private string GetSocketQueryMessage(bool subscribe = true)

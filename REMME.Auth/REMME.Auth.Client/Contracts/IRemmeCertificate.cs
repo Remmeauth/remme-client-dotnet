@@ -1,6 +1,5 @@
 ﻿using REMME.Auth.Client.Contracts.Models;
-using REMME.Auth.Client.Contracts.Models.PublicKeyStore;
-using System.Collections.Generic;
+using REMME.Auth.Client.RemmeApi.Models;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -14,41 +13,40 @@ namespace REMME.Auth.Client.Contracts
         /// <summary>
         /// Creates certificate from provided business data
         /// Will create certificate keypair, sign certificate and send 
-        /// transaction to store it on REMChain
+        /// transaction to store it's public key on REMChain
         /// </summary>
         /// <param name="certificateDataToCreate">Data transfer object with business fields</param>
-        /// <returns>Data transfer object with X509Certificate2 result and Event for subscription inside</returns>
+        /// <returns>Data transfer object with X509Certificate2 with keys result and Event for subscription inside</returns>
         Task<CertificateTransactionResponse> CreateAndStore(CertificateCreateDto certificateDataToCreate);
 
         /// <summary>
-        /// Stores a public key data to REMChain
+        /// Stores a public key of already signed and provided certificate to REMChain        
         /// </summary>
-        /// <param name="publicKeyStoreDto">Data transfer object object to get public data from</param>
-        /// <returns>Base transaction response with Event for subscription inside</returns>
-        Task<BaseTransactionResponse> StorePublicKey(PublicKeyStoreDto publicKeyStoreDto);
+        /// <param name="certificateDto">Data transfer object to get public data from and keys for signing data hash</param>
+        /// <returns>Data transfer object with X509Certificate2 with keys result and Event for subscription inside</returns>
+        Task<CertificateTransactionResponse> Store(CertificateDto certificateDto);
 
         /// <summary>
         /// Checks the certificate validity on REMchain
         /// </summary>
         /// <param name="certificate">X509Certificate2 object to get public data from</param>
-        /// <returns>True if certificate valid and was not revoked</returns>
-        Task<bool> CheckCertificate(X509Certificate2 certificate);
+        /// <returns>Data transfer object with validity information (valid dates, owner, revoke status)</returns>
+        Task<PublicKeyCheckResult> Check(X509Certificate2 certificate);
 
         /// <summary>
         /// Checks the certificate validity on REMchain
         /// </summary>
-        /// <param name="certificate">PEM encoded string of cert to get public data from</param>
-        /// <returns>True if certificate valid and was not revoked</returns>
-        Task<bool> CheckCertificate(string pemEncodedCRT);
+        /// <param name="pemEncodedCRT">PEM encoded string of cert to get public data from</param>
+        /// <returns>Data transfer object with validity information (valid dates, owner, revoke status)</returns>
+        Task<PublicKeyCheckResult> Check(string pemEncodedCRT);
 
         /// <summary>
         /// Checks the certificate validity on REMchain
         /// </summary>
-        /// <param name="certificate">Public bytes of cert to get public data from</param>
-        /// <returns>True if certificate valid and was not revoked</returns>
-        Task<bool> CheckCertificate(byte[] encodedCRT);
+        /// <param name="encodedCRT">Public bytes of cert to get public data from</param>
+        /// <returns>Data transfer object with validity information (valid dates, owner, revoke status)</returns>
+        Task<PublicKeyCheckResult> Check(byte[] encodedCRT);
 
-        /// <remarks>WILL BE REIMPLEMENTED INSIDE AFTER EXTERNALL API IS FINISHED. INTERFACE WILL BE THE SAME</remarks>
         /// <summary>
         /// <summary>
         /// Revokes the certificate on REMChain
@@ -57,27 +55,18 @@ namespace REMME.Auth.Client.Contracts
         /// <returns>Base transaction response with Event for subscription inside</returns>
         Task<BaseTransactionResponse> Revoke(X509Certificate2 certificate);
 
-        /// <remarks>WILL BE REIMPLEMENTED INSIDE AFTER EXTERNALL API IS FINISHED. INTERFACE WILL BE THE SAME</remarks>
         /// <summary>
-        /// Checks the certificate validity on REMchain
+        /// Revokes the certificate on REMChain
         /// </summary>
-        /// <param name="certificate">PEM encoded string of cert to get public data from</param>
+        /// <param name="pemEncodedCRT">PEM encoded string of cert to get public data from</param>
         /// <returns>Base transaction response with Event for subscription inside</returns>
         Task<BaseTransactionResponse> Revoke(string pemEncodedCRT);
 
-        /// <remarks>WILL BE REIMPLEMENTED INSIDE AFTER EXTERNALL API IS FINISHED. INTERFACE WILL BE THE SAME</remarks>
         /// <summary>
-        /// Checks the certificate validity on REMchain
+        /// Revokes the certificate on REMChain
         /// </summary>
-        /// <param name="certificate">Public bytes of cert to get public data from</param>
+        /// <param name="encodedCRT">Public bytes of cert to get public data from</param>
         /// <returns>Base transaction response with Event for subscription inside</returns>
         Task<BaseTransactionResponse> Revoke(byte[] encodedCRT);
-
-        /// <summary>
-        /// Retrieves the certificates of the specified user
-        /// </summary>
-        /// <param name="userPublicKey">The public key of the user to get the certificates</param>
-        /// <returns>The addresses of certificates for the specified user</returns>
-        Task<IEnumerable<string>> GetUserCertificates(string userPublicKey);
     }
 }
