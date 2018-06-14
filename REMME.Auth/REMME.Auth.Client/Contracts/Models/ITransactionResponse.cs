@@ -1,4 +1,4 @@
-﻿using REMME.Auth.Client.RemmeApi.Models;
+﻿using REMME.Auth.Client.RemmeApi.Models.Batch;
 using System;
 
 namespace REMME.Auth.Client.Contracts.Models
@@ -7,7 +7,7 @@ namespace REMME.Auth.Client.Contracts.Models
     {
         string BatchId { get; set; }
         
-        event EventHandler<BatchStatus> OnREMChainMessage;
+        event EventHandler<BatchStatusResult> OnREMChainMessage;
 
         void ConnectToWebSocket();
 

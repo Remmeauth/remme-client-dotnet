@@ -72,7 +72,7 @@ namespace REMME.Auth.Client.RemmeApi
 
                 var str = await response.Content.ReadAsStringAsync();
 
-                if (!response.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode && response.StatusCode != System.Net.HttpStatusCode.NotFound)
                     throw new RemmeNodeException(str);
 
                 result = JsonConvert.DeserializeObject<Output>(str);

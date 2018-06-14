@@ -173,8 +173,8 @@ namespace REMME.Auth.Client.Implementation
                 EntityData = certificateDto.CertificatePEM,
                 EntityOwnerType = EntityOwnerTypeEnum.Personal,
                 PublicKeyType = PublicKeyTypeEnum.RSA,
-                ValidityFrom = GetUnixTime(certificateDto.Certificate.NotBefore),
-                ValidityTo = GetUnixTime(certificateDto.Certificate.NotAfter)
+                ValidityFrom = GetUnixTime(certificateDto.Certificate.NotBefore.ToUniversalTime()),
+                ValidityTo = GetUnixTime(certificateDto.Certificate.NotAfter.ToUniversalTime())
             };
         }
 

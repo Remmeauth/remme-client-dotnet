@@ -49,7 +49,7 @@ namespace REMME.Auth.Client.Implementation
                             RemmeMethodsEnum.RawTransaction,
                             transactionPayload);
 
-            return new BaseTransactionResponse(_remmeRest.SocketAddress) { BatchId = result.BachId };
+            return new BaseTransactionResponse(_remmeRest.SocketAddress) { BatchId = result.BatchId };
         }
 
         public TransactionCreateDto GenerateTransactionDto(TransactionPayload remmeTransaction, List<string> inputsOutputs, string familyName, string familyVersion)
