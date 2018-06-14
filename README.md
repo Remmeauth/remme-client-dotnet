@@ -1,3 +1,4 @@
+
 REMME .NET Client
 ==========
 [![NuGet version](https://badge.fury.io/nu/REMME.Auth.Client.svg)](https://badge.fury.io/nu/REMME.Auth.Client)
@@ -8,7 +9,7 @@ How to use
 ----------
 1. Install and run REMME node with required REST API methods  enabled. 
 You can check out how to do that at [REMME core repo](https://github.com/Remmeauth/remme-core/). 
-*Note: you can enable/disable methods by modifying **REMME_REST_API_AVAILABLE_METHODS** eviroment variable at the .env file. *
+*Note: you can enable/disable methods by modifying **REMME_REST_API_AVAILABLE_METHODS** eviroment variable at the .env file.*
 
 2. Install the latest version of library to your .NET project
 ```
@@ -19,52 +20,91 @@ PM > Install-Package REMME.Auth.Client
 
 Examples
 ------------
-#### Tokens
+#### Account management
 ```csharp
-var client = new RemmeClient("localhost:8080", "localhost:9080");
-    
-var someRemmeAddress = "0306796698d9b14a0ba313acc7f..";
-    
-var balance = await client.Token.GetBalance(someRemmeAddress);
-	
-var transactionResult = await client.Token.Transfer(someRemmeAddress, 100);
-transactionResult.BatchConfirmed += (sender, e) =>
+var newRemmeAccount = new RemmeAccount();
+//You can get account data using next properties
+//newRemmeAccount.PublicKeyHex
+//newRemmeAccount.PrivateKeyHex
+//newRemmeAccount.Address
+```
+#### Creating client
+```csharp
+//Addresses of Docker container with runing REMME node
+var nodeAddress = "192.168.99.100:8080";
+var socketAddress = "192.168.99.100:9080";
+var privateKeyHex ="78a8f39be4570ba8dbb9b87e6918a4c2559bc4e8f3206a0a755c6f2b659a7850";
+
+var client = new RemmeClient(privateKeyHex , nodeAddress, socketAddress);
+```
+
+#### Tokens
+```csharp    
+var someRemmePublicKey = newRemmeAccount.PublicKeyHex;
+var balance = await client.Token.GetBalance(someRemmePublicKey);
+
+var transactionResult = await  client.Token.Transfer(someRemmePublicKey, 100);
+
+transactionResult.OnREMChainMessage += (sender, e) =>
 {
-	var blockNumber =  e.BlockNumber;
-	transactionResult.CloseWebSocket();
+	if (e.Status == BatchStatusEnum.OK)
+    {
+		var newBalance = await client.Token.GetBalance(someRemmePublicKey);
+		transactionResult.CloseWebSocket();
+	 }
+     else if (e.Status == BatchStatusEnum.NO_RESOURCE)
+     {
+	     transactionResult.CloseWebSocket();
+     }
 };
 transactionResult.ConnectToWebSocket();
-
 ```
-#### Certificates
+#### Certificates/Public keys
 ```csharp
-var certificateTransactioResult = await client
-		Certificate
-		.CreateAndStoreCertificate(
-		new CertificateCreateDto
-			{
-				CommonName = "userName1",
-				Email = "user@email.com",
-				Name = "John",
-				Surname = "Smith",
-				CountryName = "US",
-				Validity = 360
-			});
-certificateTransactioResult.BatchConfirmed += (sender, e) =>
-{
-	var certificateStatus = client
-		.Certificate
-		.CheckCertificate(certificateTransactioResult.Certificate).Result;
+var userKeys = await client
+					.PublicKeyStorage
+					.GetUserStoredPublicKeys(client.Account.PublicKeyHex);
 
-	 // In this place additional logic can be stored. 
-	// FI, saving user identifier to DataBase, or creating user account
-	certificateTransactioResult.CloseWebSocket();
+var certificateTransactioResult = await client
+										.Certificate
+                                        .CreateAndStore(
+	                                        new CertificateCreateDto
+                                            {
+	                                            CommonName = "userName1",
+                                                Email = "user@email.com",
+                                                Name = "John",
+                                                Surname = "Smith",
+                                                CountryName = "US",
+                                                ValidityDays = 360
+                                             });
+certificateTransactioResult.OnREMChainMessage += (sender, e) =>
+{
+	if (e.Status == BatchStatusEnum.OK)
+	{
+	    var certX509 = certificateTransactioResult.CertificateDto.Certificate;
+	    var certPubKey = certificateTransactioResult.CertificateDto.PublicKeyPem;
+	
+		//Check the status of certificate public key
+	    var certificateStatus = await client.Certificate.Check(certX509);
+		
+		//It can be also done with RemmePublicKeyStorage
+        var publicKeyCheckResult = await client.PublicKeyStorage.Check(certPubKey);
+
+		// In this place additional logic can be stored. 
+        // FI, saving user identifier to DataBase, or creating user account
+
+        //Revoking certificate public key
+		var revokeResult = await client.Certificate.Revoke(certX509).Result;
+
+		transactionResult.CloseWebSocket();
+	}
+    else if (e.Status == BatchStatusEnum.NO_RESOURCE)
+    {
+	    transactionResult.CloseWebSocket();
+	}
 };
 certificateTransactioResult.ConnectToWebSocket();
 ```
-
-
-
 License
 -------
 
