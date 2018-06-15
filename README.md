@@ -95,11 +95,11 @@ certificateTransactioResult.OnREMChainMessage += (sender, e) =>
     //Revoking certificate public key
     var revokeResult = await client.Certificate.Revoke(certX509).Result;
 		
-    transactionResult.CloseWebSocket();
+    certificateTransactioResult.CloseWebSocket();
   }	
   else if (e.Status == BatchStatusEnum.NO_RESOURCE)
   {
-    transactionResult.CloseWebSocket();
+    certificateTransactioResult.CloseWebSocket();
   }
 };
 certificateTransactioResult.ConnectToWebSocket();
