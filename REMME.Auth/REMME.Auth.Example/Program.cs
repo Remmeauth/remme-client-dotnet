@@ -98,11 +98,11 @@ namespace REMME.Auth.Example
                                         .Certificate
                                         .Revoke(certX509).Result;
 
-                    transactionResult.CloseWebSocket();
+                    certificateTransactioResult.CloseWebSocket();
                 }
                 else if (e.Status == BatchStatusEnum.NO_RESOURCE)
                 {
-                    transactionResult.CloseWebSocket();
+                    certificateTransactioResult.CloseWebSocket();
                 }
             };
 
