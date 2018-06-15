@@ -2,6 +2,7 @@
 using REMME.Auth.Client.Contracts;
 using REMME.Auth.Client.Contracts.Models;
 using REMME.Auth.Client.Crypto;
+using REMME.Auth.Client.Implementation.Utils;
 using REMME.Auth.Client.RemmeApi;
 using REMME.Auth.Client.RemmeApi.Models;
 using REMME.Auth.Client.RemmeApi.Models.Proto;
@@ -48,7 +49,33 @@ namespace REMME.Auth.Client.Implementation
                             RemmeMethodsEnum.RawTransaction,
                             transactionPayload);
 
-            return new BaseTransactionResponse(_remmeRest.SocketAddress) { BatchId = result.BachId };
+            return new BaseTransactionResponse(_remmeRest.SocketAddress) { BatchId = result.BatchId };
+        }
+
+        public TransactionCreateDto GenerateTransactionDto(TransactionPayload remmeTransaction, List<string> inputsOutputs, string familyName, string familyVersion)
+        {
+            return new TransactionCreateDto
+            {
+                FamilyName = familyName,
+                FamilyVersion = familyVersion,
+                Inputs = inputsOutputs,
+                Outputs = inputsOutputs,
+                Payload = remmeTransaction.ToByteString()
+            };
+        }
+
+        public List<string> GetDataInputOutput(string dataAddress)
+        {
+            return new List<string> { dataAddress, SignerAddress };
+        }
+
+        public TransactionPayload GetTransactionPayload(IMessage payload, uint methodNumber)
+        {
+            return new TransactionPayload
+            {
+                Method = methodNumber,
+                Data = payload.ToByteString()
+            };
         }
 
         #region Private Helpers 
@@ -79,26 +106,9 @@ namespace REMME.Auth.Client.Implementation
         }
 
         private async Task<string> GetBatcherPublicKey()
-        {
+        {            
             var result = await _remmeRest.GetRequest<NodeKeyResult>(RemmeMethodsEnum.NodePublicKey);        
             return result.NodePublicKey;
-        }
-
-        public TransactionCreateDto GenerateTransactionDto(TransactionPayload remmeTransaction, List<string> inputsOutputs, string familyName, string familyVersion)
-        {
-            return new TransactionCreateDto
-            {
-                FamilyName = familyName,
-                FamilyVersion = familyVersion,
-                Inputs = inputsOutputs,
-                Outputs = inputsOutputs,
-                Payload = remmeTransaction.ToByteString()
-            };
-        }
-
-        public List<string> GetDataInputOutput(string dataAddress)
-        {
-            return new List<string> { dataAddress, SignerAddress };
         }
 
         #endregion

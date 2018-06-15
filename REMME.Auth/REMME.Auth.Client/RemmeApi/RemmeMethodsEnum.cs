@@ -2,12 +2,10 @@
 {
     public enum RemmeMethodsEnum
     {
-        Certificate,
-        CertificateStore, 
+        PublicKey,
         Token,
         BatchStatus, 
-        Personal,
-        UserCertificates,
+        UserPublicKeys,
         RawTransaction,
         NodePublicKey
     }

@@ -72,7 +72,7 @@ namespace REMME.Auth.Client.RemmeApi
 
                 var str = await response.Content.ReadAsStringAsync();
 
-                if (!response.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode && response.StatusCode != System.Net.HttpStatusCode.NotFound)
                     throw new RemmeNodeException(str);
 
                 result = JsonConvert.DeserializeObject<Output>(str);
@@ -92,11 +92,8 @@ namespace REMME.Auth.Client.RemmeApi
             string methodUrl = string.Empty;
             switch (method)
             {
-                case RemmeMethodsEnum.Certificate:
-                    methodUrl = "certificate";
-                    break;
-                case RemmeMethodsEnum.CertificateStore:
-                    methodUrl = "certificate/store";
+                case RemmeMethodsEnum.PublicKey:
+                    methodUrl = "pub_key";
                     break;
                 case RemmeMethodsEnum.Token:
                     methodUrl = "token";
@@ -104,10 +101,7 @@ namespace REMME.Auth.Client.RemmeApi
                 case RemmeMethodsEnum.BatchStatus:
                     methodUrl = "batch_status";
                     break;
-                case RemmeMethodsEnum.Personal:
-                    methodUrl = "personal";
-                    break;
-                case RemmeMethodsEnum.UserCertificates:
+                case RemmeMethodsEnum.UserPublicKeys:
                     methodUrl = "user";
                     break;
                 case RemmeMethodsEnum.RawTransaction:
@@ -122,7 +116,7 @@ namespace REMME.Auth.Client.RemmeApi
             var output = urlParameter == null ? baseUrl : string.Format("{0}/{1}", baseUrl, urlParameter);
 
             //TODO: Refactor this code to be more readable
-            if (method == RemmeMethodsEnum.UserCertificates) output = output + "/certificates";
+            if (method == RemmeMethodsEnum.UserPublicKeys) output = output + "/pub_keys";
 
             return output;
         }

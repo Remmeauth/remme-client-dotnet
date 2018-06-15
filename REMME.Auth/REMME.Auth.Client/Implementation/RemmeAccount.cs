@@ -1,5 +1,6 @@
 ﻿using REMME.Auth.Client.Contracts;
 using REMME.Auth.Client.Crypto;
+using REMME.Auth.Client.Implementation.Utils;
 
 namespace REMME.Auth.Client.Implementation
 {
@@ -26,7 +27,7 @@ namespace REMME.Auth.Client.Implementation
 
         #endregion
 
-        public string Address { get => Utils.GetAddressFromData(PublicKeyHex, ACCOUNT_FAMILY_NAME); }
+        public string Address { get => REMChainUtils.GetAddressFromData(PublicKeyHex, ACCOUNT_FAMILY_NAME); }
 
         public string PrivateKeyHex { get => _keyPair.PrivateKey.BytesToHexString(); }
 

@@ -8,7 +8,6 @@ namespace REMME.Auth.Client.Contracts
     /// </summary>
     public interface IRemmeToken
     {
-        /// <remarks>WILL BE REIMPLEMENTED INSIDE AFTER EXTERNALL API IS FINISHED. INTERFACE WILL BE THE SAME</remarks>
         /// <summary>
         /// Transfers tokens to specific address
         /// </summary>

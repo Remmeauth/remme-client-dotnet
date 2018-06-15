@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using REMME.Auth.Client.RemmeApi.Models.Proto;
 using System.Collections.Generic;
 using Google.Protobuf;
+using REMME.Auth.Client.Implementation.Utils;
 
 namespace REMME.Auth.Client.Implementation
 {
@@ -39,7 +40,7 @@ namespace REMME.Auth.Client.Implementation
             ValidatePublicKey(publicKeyTo);
 
             var transferProto = GenerateTransferPayload(publicKeyTo, amount);
-            var remmeTransaction = GenerateRemmeTransaction(transferProto);
+            var remmeTransaction = _remmeTransactionService.GetTransactionPayload(transferProto, 0);
             var inputsOutputs = _remmeTransactionService.GetDataInputOutput(transferProto.AddressTo);
             var transactionDto = _remmeTransactionService.GenerateTransactionDto(
                                                                 remmeTransaction,
@@ -52,24 +53,13 @@ namespace REMME.Auth.Client.Implementation
             return await _remmeTransactionService.SendTransaction(resultTrans);
         }
 
-        #region Private Helpers
-
-        private TransactionPayload GenerateRemmeTransaction(TransferPayload transferPayload)
-        {
-            return new TransactionPayload
-            {
-                Method = 0,
-                Data = transferPayload.ToByteString()
-            };
-        }
-
-
+        #region Private Helpers       
 
         private TransferPayload GenerateTransferPayload(string publicKeyTo, ulong amount)
         {            
             return new TransferPayload
             {
-                AddressTo = Utils.GetAddressFromData(publicKeyTo, FAMILY_NAME),
+                AddressTo = REMChainUtils.GetAddressFromData(publicKeyTo, FAMILY_NAME),
                 Value = amount
             };
         }

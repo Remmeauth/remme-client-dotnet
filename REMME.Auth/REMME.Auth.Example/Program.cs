@@ -1,6 +1,8 @@
 ﻿using System;
 using REMME.Auth.Client.Implementation;
 using REMME.Auth.Client.Contracts.Models;
+using System.Linq;
+using REMME.Auth.Client.RemmeApi.Models.Batch;
 
 namespace REMME.Auth.Example
 {
@@ -12,35 +14,45 @@ namespace REMME.Auth.Example
             string nodeAddress = "192.168.99.100:8080";
             string socketAddress = "192.168.99.100:9080";
 
+            //Private Key from REMChain account
             var privateKeyHex = "78a8f39be4570ba8dbb9b87e6918a4c2559bc4e8f3206a0a755c6f2b659a7850";
 
             //Initialize client
             var client = new RemmeClient(privateKeyHex, nodeAddress, socketAddress);
 
-            //Token Operations
-            var someRemmeAddress = "0306796698d9b14a0ba313acc7fb14f69d8717393af5b02cc292d72009b97d8759";
-            var balance = client.Token.GetBalance(someRemmeAddress).Result;
-            Console.WriteLine("Account {0} balance - {1} REM", someRemmeAddress, balance);
+            //Account operations
+            var newRemmeAccount = new RemmeAccount();            
+            Console.WriteLine("There was created new KeyPair for account with {0} Public Key", newRemmeAccount.PublicKeyHex);
 
-            var transactionResult = client.Token.Transfer(someRemmeAddress, 100).Result;
+            //Token Operations
+            var someRemmePublicKey = newRemmeAccount.PublicKeyHex;
+            var balance = client.Token.GetBalance(someRemmePublicKey).Result;
+            Console.WriteLine("Account {0} balance - {1} REM", someRemmePublicKey, balance);
+            var transactionResult = client.Token.Transfer(someRemmePublicKey, 100).Result;
             Console.WriteLine("Sending tokens...BatchId: {0}", transactionResult.BatchId);
 
             transactionResult.OnREMChainMessage += (sender, e) =>
             {
-                if(e.Status == Client.RemmeApi.Models.BatchStatusEnum.OK)
+                if (e.Status == BatchStatusEnum.OK)
                 {
                     Console.WriteLine("Tokens were sent");
 
-                    var newBalance = client.Token.GetBalance(someRemmeAddress).Result;
-                    Console.WriteLine("Account {0} balance - {1} REM", someRemmeAddress, newBalance);
-                }
-                transactionResult.CloseWebSocket();
-            };
+                    var newBalance = client.Token.GetBalance(someRemmePublicKey).Result;
+                    Console.WriteLine("Account {0} balance - {1} REM", someRemmePublicKey, newBalance);
 
+                    transactionResult.CloseWebSocket();
+                }
+                else if (e.Status == BatchStatusEnum.NO_RESOURCE)
+                {
+                    transactionResult.CloseWebSocket();
+                }
+            };
             transactionResult.ConnectToWebSocket();
 
-            
-            //Certificates Operations
+
+            //Certificates/PubKeys Operations
+            var userKeys = client.PublicKeyStorage.GetUserStoredPublicKeys(client.Account.PublicKeyHex).Result;
+            Console.WriteLine("User has {0} stored public keys", userKeys.Count());
 
             var certificateTransactioResult = client
                                                 .Certificate
@@ -51,28 +63,49 @@ namespace REMME.Auth.Example
                                                         Email = "user@email.com",
                                                         Name = "John",
                                                         Surname = "Smith",
-                                                        CountryName = "US",                
+                                                        CountryName = "US",
                                                         ValidityDays = 360
                                                     }).Result;
-            Console.WriteLine("Issuing certificate... BatchId: ", certificateTransactioResult.BatchId);
+
+            Console.WriteLine("Issuing certificate... And storing public key on REMChain BatchId: ",
+                    certificateTransactioResult.BatchId);
+
             certificateTransactioResult.OnREMChainMessage += (sender, e) =>
             {
-                if(e.Status == Client.RemmeApi.Models.BatchStatusEnum.OK)
+                if (e.Status == BatchStatusEnum.OK)
                 {
-                    Console.WriteLine("Certificate was saved on REMchain");
+                    var certX509 = certificateTransactioResult.CertificateDto.Certificate;
+                    var certPubKey = certificateTransactioResult.CertificateDto.PublicKeyPem;
 
+                    Console.WriteLine("Certificate public key was saved on REMchain");
+
+                    //Check the status of certificate public key
                     var certificateStatus = client
                             .Certificate
-                            .CheckCertificate(certificateTransactioResult.CertificateDto.Certificate).Result;
-                    Console.WriteLine("Certificate IsValid = {0}", certificateStatus);
+                            .Check(certX509).Result;
+
+                    Console.WriteLine("Certificate IsValid = {0}", certificateStatus.IsValid);
+
+                    //It can be also done with RemmePublicKeyStorage
+                    var publicKeyCheckResult = client.PublicKeyStorage.Check(certPubKey).Result;
+                    Console.WriteLine("Certificate IsValid = {0}", publicKeyCheckResult.IsValid);
 
                     // In this place additional logic can be stored. 
                     // FI, saving user identifier to DataBase, or creating user account
+
+                    //Revoking certificate public key
+                    var revokeResult = client
+                                        .Certificate
+                                        .Revoke(certX509).Result;
+
+                    certificateTransactioResult.CloseWebSocket();
                 }
-
-
-                certificateTransactioResult.CloseWebSocket();
+                else if (e.Status == BatchStatusEnum.NO_RESOURCE)
+                {
+                    certificateTransactioResult.CloseWebSocket();
+                }
             };
+
             certificateTransactioResult.ConnectToWebSocket();
 
             Console.ReadKey(true);

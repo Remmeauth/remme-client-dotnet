@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using REMME.Auth.Client.Contracts.Exceptions;
 using REMME.Auth.Client.RemmeApi.Models;
+using REMME.Auth.Client.RemmeApi.Models.Batch;
 using System;
 using WebSocketSharp;
 
@@ -9,16 +10,16 @@ namespace REMME.Auth.Client.Contracts.Models
     public class BaseTransactionResponse : ITransactionResponse
     {
         private WebSocket _webSocket;
-        private string _socketAddress;
 
         public BaseTransactionResponse(string socketAddress)
         {
-            _socketAddress = socketAddress;
+            SocketAddress = socketAddress;
         }
 
+        public string SocketAddress { get; set; }
         public string BatchId { get; set; }
 
-        public event EventHandler<BatchStatus> OnREMChainMessage;
+        public event EventHandler<BatchStatusResult> OnREMChainMessage;
 
         public void CloseWebSocket()
         {
@@ -60,7 +61,7 @@ namespace REMME.Auth.Client.Contracts.Models
 
         private string GetSubscribeUrl()
         {
-            return string.Format("ws://{0}/ws", _socketAddress);
+            return string.Format("ws://{0}/ws", SocketAddress);
         }
 
         private string GetSocketQueryMessage(bool subscribe = true)
