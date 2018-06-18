@@ -47,7 +47,7 @@ var transactionResult = await  client.Token.Transfer(someRemmePublicKey, 100);
 
 transactionResult.OnREMChainMessage += (sender, e) =>
 {
-  if (e.Status == BatchStatusEnum.OK)
+  if (e.Status == BatchStatusEnum.COMMITTED)
   {
     var newBalance = await client.Token.GetBalance(someRemmePublicKey);
     transactionResult.CloseWebSocket();
@@ -78,7 +78,7 @@ var certificateTransactioResult = await client.Certificate
 
 certificateTransactioResult.OnREMChainMessage += (sender, e) =>
 {
-  if (e.Status == BatchStatusEnum.OK)
+  if (e.Status == BatchStatusEnum.COMMITTED)
   {
     var certX509 = certificateTransactioResult.CertificateDto.Certificate;
     var certPubKey = certificateTransactioResult.CertificateDto.PublicKeyPem;
