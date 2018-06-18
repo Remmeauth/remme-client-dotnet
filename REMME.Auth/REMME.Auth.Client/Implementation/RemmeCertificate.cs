@@ -17,6 +17,7 @@ using Org.BouncyCastle.Utilities;
 using REMME.Auth.Client.Implementation.Utils;
 using REMME.Auth.Client.Contracts.Models.PublicKeyStore;
 using REMME.Auth.Client.RemmeApi.Models;
+using System.Text;
 
 namespace REMME.Auth.Client.Implementation
 {
@@ -69,11 +70,22 @@ namespace REMME.Auth.Client.Implementation
         public async Task<PublicKeyCheckResult> Check(SystemX509.X509Certificate2 certificate)
         {
             var publicKeyPem = certificate.GetPemPublicKey();
-            return await _remmeKeyStorage.Check(publicKeyPem);
+            var checkResult = await _remmeKeyStorage.Check(publicKeyPem);
+
+            var certHashBytes = Encoding.UTF8.GetBytes(certificate.ToPemString().Sha512Digest().BytesToHexString());
+
+            var currentUtcTime = DateTime.UtcNow;
+            checkResult.IsValid = checkResult != null
+                               && !checkResult.IsRevoked
+                               && certHashBytes.BytesToHexString() == checkResult.EntityHash
+                               && currentUtcTime >= checkResult.ValidFromUtc
+                               && currentUtcTime < checkResult.ValidToUtc;
+
+            return checkResult;
         }
 
         public async Task<PublicKeyCheckResult> Check(string pemEncodedCRT)
-        {            
+        {
             return await Check(pemEncodedCRT.SystemX509FromPem());
         }
 
@@ -94,7 +106,7 @@ namespace REMME.Auth.Client.Implementation
 
         public async Task<BaseTransactionResponse> Revoke(string pemEncodedCRT)
         {
-            return await Revoke(pemEncodedCRT.SystemX509FromPem());        
+            return await Revoke(pemEncodedCRT.SystemX509FromPem());
         }
 
         public async Task<BaseTransactionResponse> Revoke(byte[] encodedCert)

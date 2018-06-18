@@ -33,7 +33,7 @@ namespace REMME.Auth.Example
 
             transactionResult.OnREMChainMessage += (sender, e) =>
             {
-                if (e.Status == BatchStatusEnum.OK)
+                if (e.Status == BatchStatusEnum.COMMITTED)
                 {
                     Console.WriteLine("Tokens were sent");
 
@@ -72,7 +72,7 @@ namespace REMME.Auth.Example
 
             certificateTransactioResult.OnREMChainMessage += (sender, e) =>
             {
-                if (e.Status == BatchStatusEnum.OK)
+                if (e.Status == BatchStatusEnum.COMMITTED)
                 {
                     var certX509 = certificateTransactioResult.CertificateDto.Certificate;
                     var certPubKey = certificateTransactioResult.CertificateDto.PublicKeyPem;

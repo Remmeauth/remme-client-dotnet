@@ -8,6 +8,9 @@ namespace REMME.Auth.Client.RemmeApi.Models
         [JsonProperty("owner")]
         public string OwnerPublicKey { get; set; }
 
+        [JsonProperty("entity_hash")]
+        public string EntityHash { get; set; }
+
         [JsonProperty("revoked")]
         public bool IsRevoked { get; set; }
 
@@ -20,8 +23,8 @@ namespace REMME.Auth.Client.RemmeApi.Models
         [JsonProperty("valid_from")]
         public uint ValidFromUnixTime { get; set; }
 
-        public DateTime ValidTo { get => GetDateTimeFromUnixTime(ValidToUnixTime); }
-        public DateTime ValidFrom { get => GetDateTimeFromUnixTime(ValidFromUnixTime); }
+        public DateTime ValidToUtc { get => GetDateTimeFromUnixTime(ValidToUnixTime); }
+        public DateTime ValidFromUtc { get => GetDateTimeFromUnixTime(ValidFromUnixTime); }
 
         private DateTime GetDateTimeFromUnixTime(uint timestamp)
         {

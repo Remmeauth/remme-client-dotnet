@@ -25,7 +25,7 @@ namespace REMME.Auth.Client.RemmeApi.Models.Batch
     public enum BatchStatusEnum
     {
         NO_RESOURCE,
-        OK,
+        COMMITTED,
         PENDING
     }
 }
