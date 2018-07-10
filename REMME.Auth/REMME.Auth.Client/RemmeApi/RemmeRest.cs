@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using REMME.Auth.Client.Contracts.Exceptions;
+using REMME.Auth.Client.RemmeApi.Models;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,18 +9,15 @@ namespace REMME.Auth.Client.RemmeApi
 {
     public class RemmeRest: IRemmeRest
     {
-        private readonly string _nodeAddress;
-        private readonly string _socketAddress;
+        private readonly RemmeNetworkConfig _remmeNetworkConfig;
 
-        public RemmeRest(string nodeAddress = "localhost:8080",
-                         string socketAddress = "localhost:9080")
+        public RemmeRest(RemmeNetworkConfig remmeNetworkConfig = null)
         {
-            _nodeAddress = nodeAddress;
-            _socketAddress = socketAddress;
+            _remmeNetworkConfig = remmeNetworkConfig == null ? new RemmeNetworkConfig() : remmeNetworkConfig;
         }
 
-        public string NodeAddress { get => _nodeAddress; }
-        public string SocketAddress { get => _socketAddress; }
+        public string ApiAddress { get => _remmeNetworkConfig.ApiAddress; }
+        public string SocketAddress { get => _remmeNetworkConfig.SocketsAddress; }
 
         public async Task<Output> GetRequest<Output>(RemmeMethodsEnum method, string requestPayload = null)
         {
@@ -110,9 +108,15 @@ namespace REMME.Auth.Client.RemmeApi
                 case RemmeMethodsEnum.NodePublicKey:
                     methodUrl = "node_key";
                     break;
+                case RemmeMethodsEnum.AtomicSwapInfo:
+                    methodUrl = "atomic-swap";
+                    break;
+                case RemmeMethodsEnum.AtomicSwapPublicKey:
+                    methodUrl = "atomic-swap/pub-key-encryption";
+                    break;
             }
 
-            var baseUrl = string.Format("http://{0}/api/v1/{1}", _nodeAddress, methodUrl);
+            var baseUrl = string.Format("{0}/api/v1/{1}", ApiAddress, methodUrl);
             var output = urlParameter == null ? baseUrl : string.Format("{0}/{1}", baseUrl, urlParameter);
 
             //TODO: Refactor this code to be more readable

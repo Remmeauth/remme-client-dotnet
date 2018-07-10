@@ -58,6 +58,7 @@
     <Compile Include="Contracts\Exceptions\RemmeConnectionException.cs" />
     <Compile Include="Contracts\Exceptions\RemmeNodeException.cs" />
     <Compile Include="Contracts\IRemmeAccount.cs" />
+    <Compile Include="Contracts\IRemmeAtomicSwap.cs" />
     <Compile Include="Contracts\IRemmeBatch.cs" />
     <Compile Include="Contracts\IRemmePublicKeyStorage.cs" />
     <Compile Include="Contracts\IRemmeTransactionService.cs" />
@@ -69,6 +70,10 @@
     <Compile Include="Contracts\Models\PublicKeyStore\EntityOwnerTypeEnum.cs" />
     <Compile Include="Contracts\Models\PublicKeyStore\PublicKeyTypeEnum.cs" />
     <Compile Include="Contracts\Models\PublicKeyStore\PublicKeyStoreDto.cs" />
+    <Compile Include="Implementation\RemmeAtomicSwap.cs" />
+    <Compile Include="RemmeApi\Models\AtomicSwap\AtomicSwapMethodEnum.cs" />
+    <Compile Include="RemmeApi\Models\AtomicSwap\PublicKeyEncryption.cs" />
+    <Compile Include="RemmeApi\Models\AtomicSwap\SwapInitDto.cs" />
     <Compile Include="Contracts\Models\TransactionCreateDto.cs" />
     <Compile Include="Implementation\RemmeAccount.cs" />
     <Compile Include="Crypto\DeterministicECDSA.cs" />
@@ -84,9 +89,12 @@
     <Compile Include="Implementation\Utils\RSAExtensions.cs" />
     <Compile Include="Implementation\Utils\REMChainUtils.cs" />
     <Compile Include="RemmeApi\IRemmeRest.cs" />
+    <Compile Include="RemmeApi\Models\AtomicSwap\SwapInfoData.cs" />
     <Compile Include="RemmeApi\Models\Batch\BatchStatusResult.cs" />
     <Compile Include="RemmeApi\Models\NodeKeyResult.cs" />
+    <Compile Include="RemmeApi\Models\Protos\AtomicSwap.cs" />
     <Compile Include="RemmeApi\Models\RawTransactionResult.cs" />
+    <Compile Include="RemmeApi\Models\RemmeNetworkConfig.cs" />
     <Compile Include="RemmeApi\Models\Sockets\BatchStateUpdateDto.cs" />
     <Compile Include="RemmeApi\Models\Sockets\BatchStatusDto.cs" />
     <Compile Include="RemmeApi\Models\PublicKeys\PublicKeyCheckPayload.cs" />

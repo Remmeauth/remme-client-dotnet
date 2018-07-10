@@ -3,6 +3,7 @@ using REMME.Auth.Client.Implementation;
 using REMME.Auth.Client.Contracts.Models;
 using System.Linq;
 using REMME.Auth.Client.RemmeApi.Models.Batch;
+using REMME.Auth.Client.RemmeApi.Models;
 
 namespace REMME.Auth.Example
 {
@@ -10,18 +11,17 @@ namespace REMME.Auth.Example
     {
         static void Main(string[] args)
         {
-            //Addresses of Docker container ports
-            string nodeAddress = "192.168.99.100:8080";
-            string socketAddress = "192.168.99.100:9080";
+            //Address of Docker container
+            string nodeAddress = "192.168.99.100";
 
             //Private Key from REMChain account
             var privateKeyHex = "78a8f39be4570ba8dbb9b87e6918a4c2559bc4e8f3206a0a755c6f2b659a7850";
 
             //Initialize client
-            var client = new RemmeClient(privateKeyHex, nodeAddress, socketAddress);
+            var client = new RemmeClient(privateKeyHex, new RemmeNetworkConfig { NodeAddress = nodeAddress });
 
             //Account operations
-            var newRemmeAccount = new RemmeAccount();            
+            var newRemmeAccount = new RemmeAccount();
             Console.WriteLine("There was created new KeyPair for account with {0} Public Key", newRemmeAccount.PublicKeyHex);
 
             //Token Operations

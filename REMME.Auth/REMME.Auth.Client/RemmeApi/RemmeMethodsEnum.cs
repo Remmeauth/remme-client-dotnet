@@ -7,6 +7,8 @@
         BatchStatus, 
         UserPublicKeys,
         RawTransaction,
-        NodePublicKey
+        NodePublicKey,
+        AtomicSwapPublicKey,
+        AtomicSwapInfo
     }
 }

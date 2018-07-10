@@ -11,5 +11,7 @@
         IRemmeBatch Batch { get; }
 
         IRemmePublicKeyStorage PublicKeyStorage { get; }
+
+        IRemmeAtomicSwap AtomicSwap { get; }
     }
 }
