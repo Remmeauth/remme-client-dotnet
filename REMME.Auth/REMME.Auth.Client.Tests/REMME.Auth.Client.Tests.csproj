@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account\RemmeAccountTests.cs" />
+    <Compile Include="AtomicSwap\RemmeAtomicSwapTests.cs" />
     <Compile Include="Certificates\RemmeCertificateTests.cs" />
     <Compile Include="PublicKeys\RemmePublicKeysTests.cs" />
     <Compile Include="Token\RemmeTokenTests.cs" />

@@ -4,7 +4,7 @@ namespace REMME.Auth.Client.RemmeApi
 {
     public interface IRemmeRest
     {
-        string NodeAddress { get; }
+        string ApiAddress { get; }
         string SocketAddress { get; }
 
         Task<Output> GetRequest<Output>(RemmeMethodsEnum method, string requestPayload = null);
