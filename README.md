@@ -31,11 +31,17 @@ var newRemmeAccount = new RemmeAccount();
 #### Creating client
 ```csharp
 //Addresses of Docker container with runing REMME node
-var nodeAddress = "192.168.99.100:8080";
-var socketAddress = "192.168.99.100:9080";
+var networkConfig = new RemmeNetworkConfig
+{
+  NodeAddress = "localhost",
+  ApiPort = "192.168.99.100", 
+  SocketsPort = "9080",
+  SslMode = false,
+  ValidatorPort = "8000"
+};
 var privateKeyHex ="78a8f39be4570ba8dbb9b87e6918a4c2559bc4e8f3206a0a755c6f2b659a7850";
 
-var client = new RemmeClient(privateKeyHex , nodeAddress, socketAddress);
+var client = new RemmeClient(privateKeyHex, networkConfig);
 ```
 
 #### Tokens
