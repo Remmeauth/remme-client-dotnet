@@ -20,6 +20,7 @@ namespace REMME.Auth.Client.Implementation
         private const string FAMILY_NAME = "pub_key";
         private const string FAMILY_VERSION = "0.1";
         private const string HASH_ALGORITHM = "SHA512";
+        private const string ECONOMY_ADDRESS = "0000007ca83d6bbb759da9ebbaccb7f4037885e3b0c44298fc1c14e3b0c44298fc1c14";
 
         private readonly IRemmeRest _remmeRest;
         private readonly IRemmeTransactionService _remmeTransactionService;
@@ -37,13 +38,14 @@ namespace REMME.Auth.Client.Implementation
 
             var pubKeyAddress = REMChainUtils.GetAddressFromData(publicKeyDto.KeyPair.GetPublicKeyPem(), FAMILY_NAME);
             var inputsOutputs = _remmeTransactionService.GetDataInputOutput(pubKeyAddress);
+            inputsOutputs.Add(ECONOMY_ADDRESS);
 
             var transactionDto = _remmeTransactionService.GenerateTransactionDto(
                                                                 remmeTransaction,
                                                                 inputsOutputs,
                                                                 FAMILY_NAME,
                                                                 FAMILY_VERSION);
-
+            
             var resultTrans = await _remmeTransactionService.CreateTransaction(transactionDto);
 
             return await _remmeTransactionService.SendTransaction(resultTrans);
@@ -71,6 +73,8 @@ namespace REMME.Auth.Client.Implementation
             var remmeTransaction = _remmeTransactionService.GetTransactionPayload(revokeProto, 1);
 
             var inputsOutputs = _remmeTransactionService.GetDataInputOutput(revokeProto.Address);
+            inputsOutputs.Add(ECONOMY_ADDRESS);
+
             var transactionDto = _remmeTransactionService.GenerateTransactionDto(
                                                                 remmeTransaction,
                                                                 inputsOutputs,
