@@ -61,7 +61,7 @@ namespace REMME.Auth.Client.Contracts.Models
 
         private string GetSubscribeUrl()
         {
-            return string.Format("{0}/ws", SocketAddress);
+            return SocketAddress;
         }
 
         private string GetSocketQueryMessage(bool subscribe = true)
