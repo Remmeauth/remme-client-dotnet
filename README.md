@@ -33,11 +33,8 @@ var newRemmeAccount = new RemmeAccount();
 //Addresses of Docker container with runing REMME node
 var networkConfig = new RemmeNetworkConfig
 {
-  NodeAddress = "localhost",
-  ApiPort = "192.168.99.100", 
-  SocketsPort = "9080",
+  NodeAddress = "192.168.99.100",
   SslMode = false,
-  ValidatorPort = "8000"
 };
 var privateKeyHex ="78a8f39be4570ba8dbb9b87e6918a4c2559bc4e8f3206a0a755c6f2b659a7850";
 
