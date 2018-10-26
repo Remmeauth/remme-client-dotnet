@@ -4,7 +4,6 @@ using REMME.Auth.Client.Contracts.Models;
 using System.Linq;
 using REMME.Auth.Client.RemmeApi.Models.Batch;
 using REMME.Auth.Client.RemmeApi.Models;
-using REMME.Auth.Client.RemmeApi;
 
 namespace REMME.Auth.Example
 {
@@ -13,21 +12,21 @@ namespace REMME.Auth.Example
         static void Main(string[] args)
         {
             //Address of Docker container
-            string nodeAddress = "35.204.123.67";
+            string nodeAddress = "192.168.99.100";
 
             //Private Key from REMChain account
-            var privateKeyHex = "d82faa16f712cfa0dc9865f52987539eca2ff5304a6193c3acf5bd00b4add21c";
+            var privateKeyHex = "78a8f39be4570ba8dbb9b87e6918a4c2559bc4e8f3206a0a755c6f2b659a7850";
 
             //Initialize client
-            var client = new RemmeClient(privateKeyHex, new RemmeNetworkConfig { NodeAddress = nodeAddress});
-            var r = client.Batch.GetStatus("bb2ed065d32e6a0c5289e4ca40fbbeeae21bb893a3ca2baff82dc259af4e1826727a2646e62dbbbba7748a80668adb3e92af620915abc2fbc468b579015f4930").Result;
+            var client = new RemmeClient(privateKeyHex, new RemmeNetworkConfig { NodeAddress = nodeAddress });
+
             //Account operations
             var newRemmeAccount = new RemmeAccount();
             Console.WriteLine("There was created new KeyPair for account with {0} Public Key", newRemmeAccount.PublicKeyHex);
 
             //Token Operations
             var someRemmePublicKey = newRemmeAccount.PublicKeyHex;
-            var balance = client.Token.GetBalance(client.Account.PublicKeyHex).Result;
+            var balance = client.Token.GetBalance(someRemmePublicKey).Result;
             Console.WriteLine("Account {0} balance - {1} REM", someRemmePublicKey, balance);
             var transactionResult = client.Token.Transfer(someRemmePublicKey, 100).Result;
             Console.WriteLine("Sending tokens...BatchId: {0}", transactionResult.BatchId);
