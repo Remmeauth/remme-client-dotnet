@@ -108,45 +108,5 @@ namespace REMME.Auth.Client.RemmeApi
         }
 
         #endregion 
-
-        ////private string GetUrlForRequest(RemmeMethodsEnum method, string urlParameter = null)
-        ////{
-        ////    string methodUrl = string.Empty;
-        ////    switch (method)
-        ////    {
-        ////        case RemmeMethodsEnum.PublicKey:
-        ////            methodUrl = "pub_key";
-        ////            break;
-        ////        case RemmeMethodsEnum.Token:
-        ////            methodUrl = "token";
-        ////            break;
-        ////        case RemmeMethodsEnum.BatchStatus:
-        ////            methodUrl = "batch_status";
-        ////            break;
-        ////        case RemmeMethodsEnum.UserPublicKeys:
-        ////            methodUrl = "user";
-        ////            break;
-        ////        case RemmeMethodsEnum.RawTransaction:
-        ////            methodUrl = "transaction";
-        ////            break;
-        ////        case RemmeMethodsEnum.NodePublicKey:
-        ////            methodUrl = "node_key";
-        ////            break;
-        ////        case RemmeMethodsEnum.AtomicSwapInfo:
-        ////            methodUrl = "atomic-swap";
-        ////            break;
-        ////        case RemmeMethodsEnum.AtomicSwapPublicKey:
-        ////            methodUrl = "atomic-swap/pub-key-encryption";
-        ////            break;
-        ////    }
-
-        //    var baseUrl = string.Format("{0}/api/v1/{1}", ApiAddress, methodUrl);
-        //    //var output = urlParameter == null ? baseUrl : string.Format("{0}/{1}", baseUrl, urlParameter);
-
-        //    ////TODO: Refactor this code to be more readable
-        //    //if (method == RemmeMethodsEnum.UserPublicKeys) output = output + "/pub_keys";
-
-        //    return ApiAddress;
-        //}
     }
 }
