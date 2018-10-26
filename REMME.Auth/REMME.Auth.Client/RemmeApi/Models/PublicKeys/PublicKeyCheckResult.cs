@@ -5,16 +5,19 @@ namespace REMME.Auth.Client.RemmeApi.Models
 {
     public class PublicKeyCheckResult
     {
-        [JsonProperty("owner")]
+        [JsonProperty("owner_public_key")]
         public string OwnerPublicKey { get; set; }
 
         [JsonProperty("entity_hash")]
         public string EntityHash { get; set; }
 
-        [JsonProperty("revoked")]
+        [JsonProperty("entity_hash_signature")]
+        public string EntityHashSignature { get; set; }
+
+        [JsonProperty("is_revoked")]
         public bool IsRevoked { get; set; }
 
-        [JsonProperty("valid")]
+        [JsonProperty("is_valid")]
         public bool IsValid { get; set; }
 
         [JsonProperty("valid_to")]

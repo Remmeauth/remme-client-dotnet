@@ -2,21 +2,27 @@
 using System.Threading.Tasks;
 using REMME.Auth.Client.RemmeApi.Models.Batch;
 using REMME.Auth.Client.RemmeApi;
+using System;
 
 namespace REMME.Auth.Client.Implementation
 {
     public class RemmeBatch : IRemmeBatch
     {
-        private readonly IRemmeRest _remmeRest;
+        private readonly IRemmeApi _remmeRest;
 
-        public RemmeBatch(IRemmeRest remmeRest)
+        public RemmeBatch(IRemmeApi remmeRest)
         {
             _remmeRest = remmeRest;
         }
 
         public async Task<BatchStatusResult> GetStatus(string batchId)
         {
-            return await _remmeRest.GetRequest<BatchStatusResult>(RemmeMethodsEnum.BatchStatus, batchId);
+            var statusString = await _remmeRest
+                            .SendRequest<GetBatchStatusRequest, string>
+                            (RemmeMethodsEnum.GetBatchStatus,
+                             new GetBatchStatusRequest { BatchId = batchId });
+
+            return new BatchStatusResult { BatchId = batchId, StatusString = statusString };
         }
     }
 }

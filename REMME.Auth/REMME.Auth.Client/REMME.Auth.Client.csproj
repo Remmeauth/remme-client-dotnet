@@ -72,7 +72,7 @@
     <Compile Include="Contracts\Models\PublicKeyStore\PublicKeyStoreDto.cs" />
     <Compile Include="Implementation\RemmeAtomicSwap.cs" />
     <Compile Include="RemmeApi\Models\AtomicSwap\AtomicSwapMethodEnum.cs" />
-    <Compile Include="RemmeApi\Models\AtomicSwap\PublicKeyEncryption.cs" />
+    <Compile Include="RemmeApi\Models\AtomicSwap\GetAtomicSwapInfoRequest.cs" />
     <Compile Include="RemmeApi\Models\AtomicSwap\SwapInitDto.cs" />
     <Compile Include="Contracts\Models\TransactionCreateDto.cs" />
     <Compile Include="Implementation\RemmeAccount.cs" />
@@ -88,28 +88,29 @@
     <Compile Include="Implementation\Utils\CertificateExtensions.cs" />
     <Compile Include="Implementation\Utils\RSAExtensions.cs" />
     <Compile Include="Implementation\Utils\REMChainUtils.cs" />
-    <Compile Include="RemmeApi\IRemmeRest.cs" />
+    <Compile Include="RemmeApi\IRemmeApi.cs" />
     <Compile Include="RemmeApi\Models\AtomicSwap\SwapInfoData.cs" />
+    <Compile Include="RemmeApi\Models\Batch\GetBatchStatusRequest.cs" />
     <Compile Include="RemmeApi\Models\Batch\BatchStatusResult.cs" />
-    <Compile Include="RemmeApi\Models\NodeKeyResult.cs" />
+    <Compile Include="RemmeApi\Models\JsonRPC\RpcResponseDto.cs" />
     <Compile Include="RemmeApi\Models\Protos\AtomicSwap.cs" />
-    <Compile Include="RemmeApi\Models\RawTransactionResult.cs" />
-    <Compile Include="RemmeApi\Models\RemmeNetworkConfig.cs" />
+    <Compile Include="RemmeApi\Models\PublicKeys\GetAccountPublicKeysRequest.cs" />
+    <Compile Include="RemmeApi\Models\Token\BalanceCheckRequest.cs" />
+    <Compile Include="RemmeApi\RemmeNetworkConfig.cs" />
+    <Compile Include="RemmeApi\Models\JsonRPC\RpcRequestDto.cs" />
     <Compile Include="RemmeApi\Models\Sockets\BatchStateUpdateDto.cs" />
     <Compile Include="RemmeApi\Models\Sockets\BatchStatusDto.cs" />
     <Compile Include="RemmeApi\Models\PublicKeys\PublicKeyCheckPayload.cs" />
     <Compile Include="RemmeApi\Models\PublicKeys\PublicKeyCheckResult.cs" />
     <Compile Include="Contracts\Models\BaseTransactionResonse.cs" />
-    <Compile Include="RemmeApi\Models\PublicKeys\UserPublicKeysResult.cs" />
     <Compile Include="RemmeApi\Models\Protos\PublicKey.cs" />
     <Compile Include="RemmeApi\Models\Protos\SawtoothTransaction.cs" />
     <Compile Include="RemmeApi\Models\Protos\Token.cs" />
     <Compile Include="RemmeApi\Models\Protos\Transaction.cs" />
-    <Compile Include="RemmeApi\Models\Token\BalanceCheckResult.cs" />
-    <Compile Include="RemmeApi\Models\RawTransactionPayload.cs" />
+    <Compile Include="RemmeApi\Models\Transaction\RawTransactionPayload.cs" />
     <Compile Include="RemmeApi\Models\Token\TransferResult.cs" />
-    <Compile Include="RemmeApi\RemmeMethodsEnum.cs" />
-    <Compile Include="RemmeApi\RemmeRest.cs" />
+    <Compile Include="RemmeApi\RemmeMethods.cs" />
+    <Compile Include="RemmeApi\RemmeApi.cs" />
     <Compile Include="Contracts\Models\ITransactionResponse.cs" />
     <Compile Include="Implementation\RemmeCertificate.cs" />
     <Compile Include="Contracts\IRemmeClient.cs" />
@@ -118,6 +119,8 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="RemmeApi\Models\Node\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

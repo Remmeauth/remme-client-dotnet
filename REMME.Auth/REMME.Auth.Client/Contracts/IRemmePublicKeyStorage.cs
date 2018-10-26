@@ -23,6 +23,13 @@ namespace REMME.Auth.Client.Contracts
         /// <summary>
         /// Checks the public key validity on REMchain
         /// </summary>
+        /// <param name="pemPublicKey">public key address</param>
+        /// <returns>Data transfer object with validity information (valid dates, owner, revoke status)</returns>
+        Task<PublicKeyCheckResult> CheckByAddress(string publicKeyAddress);
+
+        /// <summary>
+        /// Checks the public key validity on REMchain
+        /// </summary>
         /// <param name="pemPublicKey">PEM encoded string of public key</param>
         /// <returns>Data transfer object with validity information (valid dates, owner, revoke status)</returns>
         Task<PublicKeyCheckResult> Check(string pemPublicKey);
@@ -33,6 +40,13 @@ namespace REMME.Auth.Client.Contracts
         /// <param name="encodedPublicKey">Public key bytes</param>
         /// <returns>Data transfer object with validity information (valid dates, owner, revoke status)</returns>
         Task<PublicKeyCheckResult> Check(byte[] encodedPublicKey);
+
+        /// <summary>
+        /// Revokes the public key on REMChain
+        /// </summary>
+        /// <param name="pemPublicKey">public key address</param>
+        /// <returns>Base transaction response with Event for subscription inside</returns>
+        Task<BaseTransactionResponse> RevokeByAddress(string publicKeyAddress);
 
         /// <summary>
         /// Revokes the public key on REMChain
@@ -53,7 +67,7 @@ namespace REMME.Auth.Client.Contracts
         /// </summary>
         /// <param name="userAccountPublicKey">The public key of the user to get the certificates</param>
         /// <returns>The addresses of public kyes stored on REMChain for the specified user</returns>
-        Task<IEnumerable<string>> GetUserStoredPublicKeys(string userAccountPublicKey);
+        Task<IEnumerable<string>> GetAccountStoredPublicKeys(string userAccountPublicKey);
 
         /// <summary>
         /// Generates new Rsa pair from provided size

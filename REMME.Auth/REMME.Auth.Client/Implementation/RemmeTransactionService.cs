@@ -15,11 +15,11 @@ namespace REMME.Auth.Client.Implementation
     public class RemmeTransactionService : IRemmeTransactionService
     {
         private readonly IRemmeAccount _remmeAccount;
-        private readonly IRemmeRest _remmeRest;
+        private readonly RemmeApi.IRemmeApi _remmeRest;
 
         public string SignerAddress { get => _remmeAccount.Address; }
 
-        public RemmeTransactionService(IRemmeAccount remmeAccount, IRemmeRest remmeRest)
+        public RemmeTransactionService(IRemmeAccount remmeAccount, RemmeApi.IRemmeApi remmeRest)
         {
             _remmeAccount = remmeAccount;
             _remmeRest = remmeRest;
@@ -41,15 +41,15 @@ namespace REMME.Auth.Client.Implementation
         public async Task<BaseTransactionResponse> SendTransaction(Transaction transaction)
         {
             var transactionPayload = new RawTransactionPayload
-                                        {
-                                            TransactionBase64 = Convert.ToBase64String(transaction.ToByteArray())
-                                        };
+            {
+                TransactionBase64 = Convert.ToBase64String(transaction.ToByteArray())
+            };
 
-            var result = await _remmeRest.PostRequest<RawTransactionPayload, RawTransactionResult>(
-                            RemmeMethodsEnum.RawTransaction,
+            var batchId = await _remmeRest.SendRequest<RawTransactionPayload, string>(
+                            RemmeMethodsEnum.SendRawTransaction,
                             transactionPayload);
 
-            return new BaseTransactionResponse(_remmeRest.SocketAddress) { BatchId = result.BatchId };
+            return new BaseTransactionResponse(_remmeRest.SocketAddress) { BatchId = batchId };
         }
 
         public TransactionCreateDto GenerateTransactionDto(TransactionPayload remmeTransaction, List<string> inputsOutputs, string familyName, string familyVersion)
@@ -106,9 +106,8 @@ namespace REMME.Auth.Client.Implementation
         }
 
         private async Task<string> GetBatcherPublicKey()
-        {            
-            var result = await _remmeRest.GetRequest<NodeKeyResult>(RemmeMethodsEnum.NodePublicKey);        
-            return result.NodePublicKey;
+        {
+            return await _remmeRest.SendRequest<string>(RemmeMethodsEnum.GetNodePublicKey);
         }
 
         #endregion

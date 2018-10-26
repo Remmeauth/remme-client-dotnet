@@ -8,6 +8,7 @@ using REMME.Auth.Client.Contracts.Models.PublicKeyStore;
 using REMME.Auth.Client.Implementation.Utils;
 using REMME.Auth.Client.RemmeApi;
 using REMME.Auth.Client.RemmeApi.Models;
+using REMME.Auth.Client.RemmeApi.Models.PublicKeys;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,12 +21,11 @@ namespace REMME.Auth.Client.Implementation
         private const string FAMILY_NAME = "pub_key";
         private const string FAMILY_VERSION = "0.1";
         private const string HASH_ALGORITHM = "SHA512";
-        private const string ECONOMY_ADDRESS = "0000007ca83d6bbb759da9ebbaccb7f4037885e3b0c44298fc1c14e3b0c44298fc1c14";
 
-        private readonly IRemmeRest _remmeRest;
+        private readonly RemmeApi.IRemmeApi _remmeRest;
         private readonly IRemmeTransactionService _remmeTransactionService;
 
-        public RemmePublicKeyStorage(IRemmeRest remmeRest, IRemmeTransactionService remmeTransactionService)
+        public RemmePublicKeyStorage(RemmeApi.IRemmeApi remmeRest, IRemmeTransactionService remmeTransactionService)
         {
             _remmeRest = remmeRest;
             _remmeTransactionService = remmeTransactionService;
@@ -38,14 +38,15 @@ namespace REMME.Auth.Client.Implementation
 
             var pubKeyAddress = REMChainUtils.GetAddressFromData(publicKeyDto.KeyPair.GetPublicKeyPem(), FAMILY_NAME);
             var inputsOutputs = _remmeTransactionService.GetDataInputOutput(pubKeyAddress);
-            inputsOutputs.Add(ECONOMY_ADDRESS);
+            inputsOutputs.Add(REMChainUtils.GetSettingsAddressFromData("remme.economy_enabled"));
+            inputsOutputs.Add(REMChainUtils.GetSettingsAddressFromData("remme.settings.storage_pub_key"));
 
             var transactionDto = _remmeTransactionService.GenerateTransactionDto(
                                                                 remmeTransaction,
                                                                 inputsOutputs,
                                                                 FAMILY_NAME,
                                                                 FAMILY_VERSION);
-            
+
             var resultTrans = await _remmeTransactionService.CreateTransaction(transactionDto);
 
             return await _remmeTransactionService.SendTransaction(resultTrans);
@@ -53,11 +54,17 @@ namespace REMME.Auth.Client.Implementation
 
         public async Task<PublicKeyCheckResult> Check(string pemPublicKey)
         {
-            var payload = new PublicKeyCheckPayload { PublicKeyPem = pemPublicKey };
+            var address = REMChainUtils.GetAddressFromData(pemPublicKey, FAMILY_NAME);
+            return await CheckByAddress(address);
+        }
+
+        public async Task<PublicKeyCheckResult> CheckByAddress(string publicKeyAddress)
+        {
+            var payload = new PublicKeyCheckPayload { PublicKeyAddress = publicKeyAddress };
 
             return await _remmeRest
-                .PostRequest<PublicKeyCheckPayload, PublicKeyCheckResult>(
-                            RemmeMethodsEnum.PublicKey,
+                .SendRequest<PublicKeyCheckPayload, PublicKeyCheckResult>(
+                            RemmeMethodsEnum.GetPublicKeyInfo,
                             payload);
         }
 
@@ -67,13 +74,16 @@ namespace REMME.Auth.Client.Implementation
             return await Check(encodedPublicKey);
         }
 
-        public async Task<BaseTransactionResponse> Revoke(string pemPublicKey)
+        public async Task<BaseTransactionResponse> RevokeByAddress(string publicKeyAddress)
         {
-            var revokeProto = GenerateRevokePayload(pemPublicKey);
+            var revokeProto = new RevokePubKeyPayload
+            {
+                Address = publicKeyAddress
+            };
             var remmeTransaction = _remmeTransactionService.GetTransactionPayload(revokeProto, 1);
 
             var inputsOutputs = _remmeTransactionService.GetDataInputOutput(revokeProto.Address);
-            inputsOutputs.Add(ECONOMY_ADDRESS);
+            inputsOutputs.Add(REMChainUtils.GetSettingsAddressFromData("remme.economy_enabled"));
 
             var transactionDto = _remmeTransactionService.GenerateTransactionDto(
                                                                 remmeTransaction,
@@ -86,18 +96,24 @@ namespace REMME.Auth.Client.Implementation
             return await _remmeTransactionService.SendTransaction(resultTrans);
         }
 
+        public async Task<BaseTransactionResponse> Revoke(string pemPublicKey)
+        {
+            var publicKeyAddress = REMChainUtils.GetAddressFromData(pemPublicKey, FAMILY_NAME);
+            return await RevokeByAddress(publicKeyAddress);
+        }
+
         public async Task<BaseTransactionResponse> Revoke(byte[] encodedPublicKey)
         {
             var pemPublicKey = string.Format(RSAExtensions.PUBLIC_KEY_PEM_FORMAT, Convert.ToBase64String(encodedPublicKey));
             return await Revoke(pemPublicKey);
         }
 
-        public async Task<IEnumerable<string>> GetUserStoredPublicKeys(string userAccountPublicKey)
+        public async Task<IEnumerable<string>> GetAccountStoredPublicKeys(string accountPublicKey)
         {
-            var result = await _remmeRest.GetRequest<UserPublicKeysResult>(
-                    RemmeMethodsEnum.UserPublicKeys, userAccountPublicKey);
-
-            return result.PublicKeysAdresses;
+            return await _remmeRest
+                .SendRequest<GetAccountPublicKeysRequest, IEnumerable<string>>
+                (RemmeMethodsEnum.GetAccountPublicKeysList,
+                 new GetAccountPublicKeysRequest { PublicKey = accountPublicKey });
         }
 
         public AsymmetricCipherKeyPair GenerateRsaKeyPair(int rsaKeySize = 2048)
@@ -147,15 +163,7 @@ namespace REMME.Auth.Client.Implementation
                 ValidFrom = publicKeyDto.ValidityFrom,
                 ValidTo = publicKeyDto.ValidityTo
             };
-        }
-
-        private RevokePubKeyPayload GenerateRevokePayload(string publicKeyPem)
-        {
-            return new RevokePubKeyPayload
-            {
-                Address = REMChainUtils.GetAddressFromData(publicKeyPem, FAMILY_NAME)
-            };
-        }
+        }        
 
         #endregion
     }

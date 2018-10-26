@@ -18,11 +18,14 @@ namespace REMME.Auth.Client.Implementation
         private const string FAMILY_VERSION = "0.1";
         private readonly string ZERO_ADDRESS = new String('0', 70);
         private const string SWAP_COMISSION = "0000007ca83d6bbb759da9cde0fb0dec1400c55cc3bbcd6b1243b2e3b0c44298fc1c14";
+        private const string BLOCK_INFO_NAMESPACE_ADDRESS = "00b10c00";
+        private readonly string BLOCK_INFO_CONFIG_ADDRESS = "00b10c00" + new String('0', 62);
 
-        private readonly IRemmeRest _remmeRest;
+
+        private readonly RemmeApi.IRemmeApi _remmeRest;
         private readonly IRemmeTransactionService _remmeTransactionService;
 
-        public RemmeAtomicSwap(IRemmeRest remmeRest, IRemmeTransactionService remmeTransactionService)
+        public RemmeAtomicSwap(RemmeApi.IRemmeApi remmeRest, IRemmeTransactionService remmeTransactionService)
         {
             _remmeRest = remmeRest;
             _remmeTransactionService = remmeTransactionService;
@@ -62,13 +65,17 @@ namespace REMME.Auth.Client.Implementation
 
         public async Task<SwapInfoDto> GetInfo(string swapId)
         {
-            return await _remmeRest.GetRequest<SwapInfoDto>(RemmeMethodsEnum.AtomicSwapInfo, swapId);
+            return await _remmeRest
+                .SendRequest<GetAtomicSwapInfoRequest, SwapInfoDto>
+                (RemmeMethodsEnum.GetAtomicSwapInfo,
+                 new GetAtomicSwapInfoRequest { SwapId = swapId });
         }
 
         public async Task<string> GetPublicKey()
         {
-            var result = await _remmeRest.GetRequest<PublicKeyEncryption>(RemmeMethodsEnum.AtomicSwapPublicKey);
-            return result.PublicKey;
+            return await _remmeRest
+                .SendRequest<string>
+                (RemmeMethodsEnum.GetAtomicSwapPublicKey);
         }
 
         #region Private Helpers
@@ -102,9 +109,13 @@ namespace REMME.Auth.Client.Implementation
                 case AtomicSwapMethodEnum.Init:
                     result.Add(ZERO_ADDRESS);
                     result.Add(SWAP_COMISSION);
+                    result.Add(BLOCK_INFO_CONFIG_ADDRESS);
+                    result.Add(BLOCK_INFO_NAMESPACE_ADDRESS);
                     break;
                 case AtomicSwapMethodEnum.Expire:
                     result.Add(ZERO_ADDRESS);
+                    result.Add(BLOCK_INFO_CONFIG_ADDRESS);
+                    result.Add(BLOCK_INFO_NAMESPACE_ADDRESS);
                     break;
                 case AtomicSwapMethodEnum.Close:
                     result.Add(ZERO_ADDRESS);

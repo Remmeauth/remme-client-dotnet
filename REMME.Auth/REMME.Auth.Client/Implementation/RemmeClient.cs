@@ -6,7 +6,7 @@ namespace REMME.Auth.Client.Implementation
 {
     public class RemmeClient : IRemmeClient
     {
-        private readonly IRemmeRest _remmeRest;
+        private readonly RemmeApi.IRemmeApi _remmeRest;
         private readonly IRemmeTransactionService _remmeTransactionService;
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace REMME.Auth.Client.Implementation
         /// <param name="remmeAccount">Remme Account object which should incapsulate keys data</param>
         public RemmeClient(RemmeAccount remmeAccount, RemmeNetworkConfig remmeNetworkConfig = null)
         {
-            _remmeRest = new RemmeRest(remmeNetworkConfig);
+            _remmeRest = new RemmeApi.RemmeApi(remmeNetworkConfig);
             Account = remmeAccount;
             _remmeTransactionService = new RemmeTransactionService(Account, _remmeRest);
             PublicKeyStorage = new RemmePublicKeyStorage(_remmeRest, _remmeTransactionService);

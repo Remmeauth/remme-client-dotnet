@@ -20,7 +20,7 @@ namespace REMME.Auth.Client.Tests.AtomicSwap
         public void Init_ValidDataProvided_TransactionSent()
         {
             // Arrange
-            var mockRest = new Mock<IRemmeRest>();
+            var mockRest = new Mock<RemmeApi.IRemmeApi>();
             var mockTransactionService = new Mock<IRemmeTransactionService>();
             mockTransactionService.Setup(a => a.SendTransaction(It.IsAny<Transaction>()))
                     .ReturnsAsync(new BaseTransactionResponse(string.Empty) { BatchId = MOCK_BATCH_ID });
@@ -39,7 +39,7 @@ namespace REMME.Auth.Client.Tests.AtomicSwap
         {
             // Arrange
             var mockTransactionService = new Mock<IRemmeTransactionService>();
-            var mockRest = new Mock<IRemmeRest>();
+            var mockRest = new Mock<RemmeApi.IRemmeApi>();
 
             var mock = new Mock<IRemmeTransactionService>();
             mock.Setup(a => a.SendTransaction(It.IsAny<Transaction>()))
@@ -57,9 +57,9 @@ namespace REMME.Auth.Client.Tests.AtomicSwap
         {
             // Arrange
             var mockTransactionService = new Mock<IRemmeTransactionService>();
-            var mockRest = new Mock<IRemmeRest>();
+            var mockRest = new Mock<RemmeApi.IRemmeApi>();
 
-            mockRest.Setup(a => a.GetRequest<SwapInfoDto>(RemmeMethodsEnum.AtomicSwapInfo, It.IsAny<string>()))
+            mockRest.Setup(a => a.GetRequest<SwapInfoDto>(RemmeMethodsEnum.GetAtomicSwapInfo, It.IsAny<string>()))
                     .ReturnsAsync(new SwapInfoDto() { SwapId = MOCK_SWAP_ID });
             var swap = new RemmeAtomicSwap(mockRest.Object, mockTransactionService.Object);
 

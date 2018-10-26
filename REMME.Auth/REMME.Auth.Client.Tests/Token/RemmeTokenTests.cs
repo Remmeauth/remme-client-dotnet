@@ -24,9 +24,9 @@ namespace REMME.Auth.Client.Tests.Token
         {
 
             // Arrange
-            var mock = new Mock<IRemmeRest>();
+            var mock = new Mock<RemmeApi.IRemmeApi>();
             mock.Setup(a => a.GetRequest<BalanceCheckResult>
-                (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.Token == t), It.IsAny<string>()))
+                (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.GetBalance == t), It.IsAny<string>()))
                 .ReturnsAsync(new BalanceCheckResult() { Balance = MOCK_BALANCE.ToString() });
 
             var token = new RemmeToken(mock.Object, new Mock<IRemmeTransactionService>().Object);
@@ -43,9 +43,9 @@ namespace REMME.Auth.Client.Tests.Token
         {
 
             // Arrange
-            var mock = new Mock<IRemmeRest>();
+            var mock = new Mock<RemmeApi.IRemmeApi>();
             mock.Setup(a => a.GetRequest<BalanceCheckResult>
-                (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.Token == t), It.IsAny<string>()))
+                (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.GetBalance == t), It.IsAny<string>()))
                 .Throws(new RemmeNodeException(MOCK_EXCEPTION_MESSAGE));
 
             var token = new RemmeToken(mock.Object, new Mock<IRemmeTransactionService>().Object);
@@ -61,9 +61,9 @@ namespace REMME.Auth.Client.Tests.Token
         {
 
             // Arrange
-            var mock = new Mock<IRemmeRest>();
+            var mock = new Mock<RemmeApi.IRemmeApi>();
             mock.Setup(a => a.GetRequest<BalanceCheckResult>
-                (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.Token == t), It.IsAny<string>()))
+                (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.GetBalance == t), It.IsAny<string>()))
                 .Throws(new RemmeConnectionException(MOCK_EXCEPTION_MESSAGE));
 
             var token = new RemmeToken(mock.Object, new Mock<IRemmeTransactionService>().Object);
@@ -78,7 +78,7 @@ namespace REMME.Auth.Client.Tests.Token
         {
 
             // Arrange
-            var mock = new Mock<IRemmeRest>();
+            var mock = new Mock<RemmeApi.IRemmeApi>();
             var mockTransSerive = new Mock<IRemmeTransactionService>();
             mockTransSerive.Setup(a => a.CreateTransaction(It.IsAny<TransactionCreateDto>()))
                  .ReturnsAsync(new Transaction());
@@ -99,7 +99,7 @@ namespace REMME.Auth.Client.Tests.Token
         {
 
             // Arrange
-            var mock = new Mock<IRemmeRest>();
+            var mock = new Mock<RemmeApi.IRemmeApi>();
             var mockTransSerive = new Mock<IRemmeTransactionService>();
             mockTransSerive.Setup(a => a.CreateTransaction(It.IsAny<TransactionCreateDto>()))
                 .Throws(new RemmeNodeException(MOCK_EXCEPTION_MESSAGE));
@@ -117,7 +117,7 @@ namespace REMME.Auth.Client.Tests.Token
         {
 
             // Arrange
-            var mock = new Mock<IRemmeRest>();
+            var mock = new Mock<RemmeApi.IRemmeApi>();
             var mockTransSerive = new Mock<IRemmeTransactionService>();
             mockTransSerive.Setup(a => a.CreateTransaction(It.IsAny<TransactionCreateDto>()))
                 .Throws(new RemmeConnectionException(MOCK_EXCEPTION_MESSAGE));

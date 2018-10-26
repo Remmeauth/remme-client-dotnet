@@ -24,10 +24,10 @@ namespace REMME.Auth.Client.Tests.Certificate
         public void Check_ValidPemDataProvided_StatusReturned()
         {
             // Arrange
-            var mock = new Mock<IRemmeRest>();
+            var mock = new Mock<RemmeApi.IRemmeApi>();
             var isRevoked = true;
             mock.Setup(a => a.PostRequest<PublicKeyCheckPayload, PublicKeyCheckResult>
-                    (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.PublicKey == t), It.IsAny<PublicKeyCheckPayload>()))
+                    (It.Is<RemmeMethodsEnum>(t => RemmeMethodsEnum.GetPublicKeyInfo == t), It.IsAny<PublicKeyCheckPayload>()))
                     .ReturnsAsync(new PublicKeyCheckResult() { IsRevoked = isRevoked });
 
             var publicKey = new RemmePublicKeyStorage(mock.Object, new Mock<IRemmeTransactionService>().Object);
@@ -48,7 +48,7 @@ namespace REMME.Auth.Client.Tests.Certificate
             mock.Setup(a => a.SendTransaction(It.IsAny<Transaction>()))
                     .ReturnsAsync(new BaseTransactionResponse(string.Empty) { BatchId = MOCK_BATCH_ID });
 
-            var publicKey = new RemmePublicKeyStorage(new Mock<IRemmeRest>().Object, mock.Object);
+            var publicKey = new RemmePublicKeyStorage(new Mock<RemmeApi.IRemmeApi>().Object, mock.Object);
 
             //Act
             var actualCheckResult = publicKey.Revoke(GetPublicKeyPem()).Result;
