@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REMME.Auth.Client", "REMME.Auth.Client\REMME.Auth.Client.csproj", "{9141E380-102C-4B0E-AC63-BFE3766BF036}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REMME.Auth.Example.DotNetFramework", "REMME.Auth.Example.DotNetFramework\REMME.Auth.Example.DotNetFramework.csproj", "{318DA1E6-CBCA-441C-8D64-4FEA978E0308}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REMME.Auth.Client.Tests", "REMME.Auth.Client.Tests\REMME.Auth.Client.Tests.csproj", "{24AD3FFA-8202-44EC-B7A0-709DAF08C046}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REMME.Auth.Example.DotNetCore", "REMME.Auth.Example.DotnetCore\REMME.Auth.Example.DotNetCore.csproj", "{77FF68EC-C24E-403C-81FE-AAE48BE60D9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REMME.Auth.Example", "REMME.Auth.Example\REMME.Auth.Example.csproj", "{318DA1E6-CBCA-441C-8D64-4FEA978E0308}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REMME.Auth.Client", "REMME.Auth.Client\REMME.Auth.Client.csproj", "{ABAE9B22-533D-4A13-87D0-3D966F399722}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,20 +15,23 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9141E380-102C-4B0E-AC63-BFE3766BF036}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9141E380-102C-4B0E-AC63-BFE3766BF036}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9141E380-102C-4B0E-AC63-BFE3766BF036}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9141E380-102C-4B0E-AC63-BFE3766BF036}.Release|Any CPU.Build.0 = Release|Any CPU
-		{24AD3FFA-8202-44EC-B7A0-709DAF08C046}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{24AD3FFA-8202-44EC-B7A0-709DAF08C046}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{24AD3FFA-8202-44EC-B7A0-709DAF08C046}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{24AD3FFA-8202-44EC-B7A0-709DAF08C046}.Release|Any CPU.Build.0 = Release|Any CPU
 		{318DA1E6-CBCA-441C-8D64-4FEA978E0308}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{318DA1E6-CBCA-441C-8D64-4FEA978E0308}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{318DA1E6-CBCA-441C-8D64-4FEA978E0308}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{318DA1E6-CBCA-441C-8D64-4FEA978E0308}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77FF68EC-C24E-403C-81FE-AAE48BE60D9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77FF68EC-C24E-403C-81FE-AAE48BE60D9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77FF68EC-C24E-403C-81FE-AAE48BE60D9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77FF68EC-C24E-403C-81FE-AAE48BE60D9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABAE9B22-533D-4A13-87D0-3D966F399722}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABAE9B22-533D-4A13-87D0-3D966F399722}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABAE9B22-533D-4A13-87D0-3D966F399722}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABAE9B22-533D-4A13-87D0-3D966F399722}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DE34B37E-A4AB-4F93-A905-4F2B6729B420}
 	EndGlobalSection
 EndGlobal
