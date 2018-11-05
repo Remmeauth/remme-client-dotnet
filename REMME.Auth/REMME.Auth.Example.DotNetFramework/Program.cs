@@ -51,7 +51,7 @@ namespace REMME.Auth.Example
 
 
             //Certificates/PubKeys Operations
-            var userKeys = client.PublicKeyStorage.GetUserStoredPublicKeys(client.Account.PublicKeyHex).Result;
+            var userKeys = client.PublicKeyStorage.GetAccountStoredPublicKeys(client.Account.PublicKeyHex).Result;
             Console.WriteLine("User has {0} stored public keys", userKeys.Count());
 
             var certificateTransactioResult = client

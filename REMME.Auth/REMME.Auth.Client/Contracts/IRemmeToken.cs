@@ -21,6 +21,6 @@ namespace REMME.Auth.Client.Contracts
         /// </summary>
         /// <param name="publicKey"></param>
         /// <returns>Integer representing REM balance</returns>
-        Task<int> GetBalance(string publicKey);
+        Task<ulong> GetBalance(string publicKey);
     }
 }

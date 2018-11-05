@@ -47,6 +47,18 @@ namespace REMME.Auth.Client.Implementation.Utils
         }
 
         /// <summary>
+        /// Calculates the SHA256 byte checksum of the input string
+        /// </summary>
+        public static byte[] Sha256Digest(this string input)
+        {
+            using (SHA256 shaM = new SHA256Managed())
+            {
+                var data = Encoding.UTF8.GetBytes(input);
+                return shaM.ComputeHash(data);
+            }
+        }
+
+        /// <summary>
         /// Calculates the SHA512 64 byte checksum of the input bytes
         /// </summary>
         /// <param name="input">Bytes input to get checksum</param>

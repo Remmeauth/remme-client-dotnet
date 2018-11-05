@@ -17,22 +17,23 @@ namespace REMME.Auth.Client.Implementation
         private const string FAMILY_NAME = "account";
         private const string FAMILY_VERSION = "0.1";
 
-        private readonly IRemmeRest _remmeRest;
+        private readonly RemmeApi.IRemmeApi _remmeRest;
         private readonly IRemmeTransactionService _remmeTransactionService;
 
-        public RemmeToken(IRemmeRest remmeRest, IRemmeTransactionService remmeTransactionService)
+        public RemmeToken(RemmeApi.IRemmeApi remmeRest, IRemmeTransactionService remmeTransactionService)
         {
             _remmeRest = remmeRest;
             _remmeTransactionService = remmeTransactionService;
         }
 
-        public async Task<int> GetBalance(string publicKey)
+        public async Task<ulong> GetBalance(string publicKey)
         {
             ValidatePublicKey(publicKey);
 
-            var result = await _remmeRest.GetRequest<BalanceCheckResult>(RemmeMethodsEnum.Token, publicKey);
-
-            return Convert.ToInt32(result.Balance);
+            return await _remmeRest
+                            .SendRequest<BalanceCheckRequest, ulong>
+                            (RemmeMethodsEnum.GetBalance,
+                             new BalanceCheckRequest { PublicKey = publicKey });
         }
 
         public async Task<BaseTransactionResponse> Transfer(string publicKeyTo, ulong amount)
@@ -44,8 +45,8 @@ namespace REMME.Auth.Client.Implementation
             var inputsOutputs = _remmeTransactionService.GetDataInputOutput(transferProto.AddressTo);
             var transactionDto = _remmeTransactionService.GenerateTransactionDto(
                                                                 remmeTransaction,
-                                                                inputsOutputs, 
-                                                                FAMILY_NAME, 
+                                                                inputsOutputs,
+                                                                FAMILY_NAME,
                                                                 FAMILY_VERSION);
 
             var resultTrans = await _remmeTransactionService.CreateTransaction(transactionDto);
@@ -56,7 +57,7 @@ namespace REMME.Auth.Client.Implementation
         #region Private Helpers       
 
         private TransferPayload GenerateTransferPayload(string publicKeyTo, ulong amount)
-        {            
+        {
             return new TransferPayload
             {
                 AddressTo = REMChainUtils.GetAddressFromData(publicKeyTo, FAMILY_NAME),
