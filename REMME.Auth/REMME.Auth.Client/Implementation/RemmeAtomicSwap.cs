@@ -19,7 +19,7 @@ namespace REMME.Auth.Client.Implementation
         private readonly string ZERO_ADDRESS = new String('0', 70);
         private const string SWAP_COMISSION = "0000007ca83d6bbb759da9cde0fb0dec1400c55cc3bbcd6b1243b2e3b0c44298fc1c14";
         private const string BLOCK_INFO_NAMESPACE_ADDRESS = "00b10c00";
-        private readonly string BLOCK_INFO_CONFIG_ADDRESS = "00b10c00" + new String('0', 62);
+        private readonly string BLOCK_INFO_CONFIG_ADDRESS = "00b10c01";
 
 
         private readonly RemmeApi.IRemmeApi _remmeRest;

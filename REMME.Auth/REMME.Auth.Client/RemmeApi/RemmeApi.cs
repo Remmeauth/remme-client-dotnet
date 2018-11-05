@@ -17,7 +17,7 @@ namespace REMME.Auth.Client.RemmeApi
 
         public RemmeApi(RemmeNetworkConfig remmeNetworkConfig = null)
         {
-            _remmeNetworkConfig = remmeNetworkConfig == null ? new RemmeNetworkConfig() : remmeNetworkConfig;
+            _remmeNetworkConfig = remmeNetworkConfig ?? new RemmeNetworkConfig();
         }
 
         public string ApiAddress { get => _remmeNetworkConfig.ApiAddress; }
