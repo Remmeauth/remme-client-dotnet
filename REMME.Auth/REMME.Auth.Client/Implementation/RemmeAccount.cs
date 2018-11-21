@@ -7,7 +7,7 @@ namespace REMME.Auth.Client.Implementation
     public class RemmeAccount : IRemmeAccount
     {
         private EcKeyPair _keyPair;
-        private const string ACCOUNT_FAMILY_NAME = "account";
+        public const string ACCOUNT_FAMILY_NAME = "account";
 
         #region Constructors
 

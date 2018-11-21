@@ -13,7 +13,7 @@ namespace REMME.Auth.Client.RemmeApi
                 {RemmeMethodsEnum.GetAtomicSwapInfo, "get_atomic_swap_info" },
                 {RemmeMethodsEnum.GetAtomicSwapPublicKey, "get_atomic_swap_public_key" },
                 {RemmeMethodsEnum.GetAccountPublicKeysList, "get_public_keys_list" },
-                {RemmeMethodsEnum.GetNodePublicKey, "get_node_public_key" },
+                {RemmeMethodsEnum.GetNodeConfig, "get_node_config" },
                 {RemmeMethodsEnum.ExportNodePrivateKey, "export_node_key" },
                 {RemmeMethodsEnum.SendRawTransaction, "send_raw_transaction" },
 
@@ -45,7 +45,7 @@ namespace REMME.Auth.Client.RemmeApi
         GetAtomicSwapInfo,
         GetAtomicSwapPublicKey,
         GetAccountPublicKeysList,
-        GetNodePublicKey,
+        GetNodeConfig,
         ExportNodePrivateKey,
         SendRawTransaction,
 

@@ -30,37 +30,47 @@ namespace REMME.Auth.Client.Implementation
         {
             ValidatePublicKey(publicKey);
 
-            return await _remmeRest
-                            .SendRequest<BalanceCheckRequest, ulong>
-                            (RemmeMethodsEnum.GetBalance,
-                             new BalanceCheckRequest { PublicKey = publicKey });
+            return await GetBalanceByAddress(REMChainUtils.GetAddressFromData(publicKey, FAMILY_NAME));
         }
 
-        public async Task<BaseTransactionResponse> Transfer(string publicKeyTo, ulong amount)
+        public async Task<ulong> GetBalanceByAddress(string publicKey)
         {
-            ValidatePublicKey(publicKeyTo);
-
-            var transferProto = GenerateTransferPayload(publicKeyTo, amount);
+            return await _remmeRest
+                .SendRequest<BalanceCheckRequest, ulong>
+                (RemmeMethodsEnum.GetBalance,
+                    new BalanceCheckRequest { PublicKey = publicKey });
+        }
+        
+        public async Task<BaseTransactionResponse> TransferByAddress(string addressTo, ulong amount)
+        {
+            var transferProto = GenerateTransferPayload(addressTo, amount);
             var remmeTransaction = _remmeTransactionService.GetTransactionPayload(transferProto, 0);
             var inputsOutputs = _remmeTransactionService.GetDataInputOutput(transferProto.AddressTo);
             var transactionDto = _remmeTransactionService.GenerateTransactionDto(
-                                                                remmeTransaction,
-                                                                inputsOutputs,
-                                                                FAMILY_NAME,
-                                                                FAMILY_VERSION);
+                remmeTransaction,
+                inputsOutputs,
+                FAMILY_NAME,
+                FAMILY_VERSION);
 
             var resultTrans = await _remmeTransactionService.CreateTransaction(transactionDto);
 
             return await _remmeTransactionService.SendTransaction(resultTrans);
         }
 
+        public async Task<BaseTransactionResponse> Transfer(string publicKeyTo, ulong amount)
+        {
+            ValidatePublicKey(publicKeyTo);
+
+            return await TransferByAddress(REMChainUtils.GetAddressFromData(publicKeyTo, FAMILY_NAME), amount);
+        }
+
         #region Private Helpers       
 
-        private TransferPayload GenerateTransferPayload(string publicKeyTo, ulong amount)
+        private TransferPayload GenerateTransferPayload(string addressTo, ulong amount)
         {
             return new TransferPayload
             {
-                AddressTo = REMChainUtils.GetAddressFromData(publicKeyTo, FAMILY_NAME),
+                AddressTo = addressTo,
                 Value = amount
             };
         }

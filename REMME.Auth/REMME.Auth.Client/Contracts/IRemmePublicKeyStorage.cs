@@ -70,6 +70,13 @@ namespace REMME.Auth.Client.Contracts
         Task<IEnumerable<string>> GetAccountStoredPublicKeys(string userAccountPublicKey);
 
         /// <summary>
+        /// Retrieves the public kyes of the specified user
+        /// </summary>
+        /// <param name="userAccountAddress">The address of the user to get the certificates</param>
+        /// <returns>The addresses of public kyes stored on REMChain for the specified user</returns>
+        Task<IEnumerable<string>> GetAccountStoredPublicKeysByAddress(string userAccountAddress);
+        
+        /// <summary>
         /// Generates new Rsa pair from provided size
         /// </summary>
         /// <param name="rsaKeySize">Rsa Key Size</param>

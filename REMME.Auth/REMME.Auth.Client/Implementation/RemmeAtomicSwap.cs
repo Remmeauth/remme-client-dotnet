@@ -20,6 +20,7 @@ namespace REMME.Auth.Client.Implementation
         private const string SWAP_COMISSION = "0000007ca83d6bbb759da9cde0fb0dec1400c55cc3bbcd6b1243b2e3b0c44298fc1c14";
         private const string BLOCK_INFO_NAMESPACE_ADDRESS = "00b10c00";
         private readonly string BLOCK_INFO_CONFIG_ADDRESS = "00b10c01";
+        private readonly string SettingsKeyGenesisOwners = REMChainUtils.GetSettingsAddressFromData("remme.settings.genesis_owners");
 
 
         private readonly RemmeApi.IRemmeApi _remmeRest;
@@ -111,15 +112,18 @@ namespace REMME.Auth.Client.Implementation
                     result.Add(SWAP_COMISSION);
                     result.Add(BLOCK_INFO_CONFIG_ADDRESS);
                     result.Add(BLOCK_INFO_NAMESPACE_ADDRESS);
+                    result.Add(SettingsKeyGenesisOwners);
                     break;
                 case AtomicSwapMethodEnum.Expire:
                     result.Add(ZERO_ADDRESS);
                     result.Add(BLOCK_INFO_CONFIG_ADDRESS);
                     result.Add(BLOCK_INFO_NAMESPACE_ADDRESS);
+                    result.Add(SettingsKeyGenesisOwners);
                     break;
                 case AtomicSwapMethodEnum.Close:
                     result.Add(ZERO_ADDRESS);
                     result.Add(receiverAddress);
+                    result.Add(SettingsKeyGenesisOwners);
                     break;
                 default:
                     break;

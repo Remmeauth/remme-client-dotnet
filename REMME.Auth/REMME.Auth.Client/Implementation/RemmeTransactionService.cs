@@ -107,7 +107,8 @@ namespace REMME.Auth.Client.Implementation
 
         private async Task<string> GetBatcherPublicKey()
         {
-            return await _remmeRest.SendRequest<string>(RemmeMethodsEnum.GetNodePublicKey);
+            return (await _remmeRest.SendRequest<NodeConfigResponse>(RemmeMethodsEnum.GetNodeConfig))
+                .NodePublicKey;
         }
 
         #endregion

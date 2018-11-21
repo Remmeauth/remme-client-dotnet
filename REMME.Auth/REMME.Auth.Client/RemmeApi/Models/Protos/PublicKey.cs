@@ -41,7 +41,7 @@ public static partial class PubKeyReflection
             new pbr::FileDescriptor[] { },
             new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
           new pbr::GeneratedClrTypeInfo(typeof(global::PubKeyMethod), global::PubKeyMethod.Parser, null, null, new[]{ typeof(global::PubKeyMethod.Types.Method) }, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::NewPubKeyPayload), global::NewPubKeyPayload.Parser, new[]{ "PublicKey", "PublicKeyType", "EntityType", "EntityHash", "EntityHashSignature", "ValidFrom", "ValidTo" }, null, new[]{ typeof(global::NewPubKeyPayload.Types.EntityType), typeof(global::NewPubKeyPayload.Types.PubKeyType) }, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::NewPubKeyPayload), global::NewPubKeyPayload.Parser, new[]{ "PublicKeyAddress", "PublicKeyType", "EntityType", "EntityHash", "EntityHashSignature", "ValidFrom", "ValidTo" }, null, new[]{ typeof(global::NewPubKeyPayload.Types.EntityType), typeof(global::NewPubKeyPayload.Types.PubKeyType) }, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::RevokePubKeyPayload), global::RevokePubKeyPayload.Parser, new[]{ "Address" }, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::PubKeyStorage), global::PubKeyStorage.Parser, new[]{ "Owner", "Payload", "Revoked" }, null, null, null)
             }));
