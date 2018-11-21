@@ -110,10 +110,16 @@ namespace REMME.Auth.Client.Implementation
 
         public async Task<IEnumerable<string>> GetAccountStoredPublicKeys(string accountPublicKey)
         {
+            return await GetAccountStoredPublicKeysByAddress(
+                REMChainUtils.GetAddressFromData(accountPublicKey, RemmeAccount.ACCOUNT_FAMILY_NAME));
+        }
+
+        public async Task<IEnumerable<string>> GetAccountStoredPublicKeysByAddress(string userAccountAddress)
+        {
             return await _remmeRest
                 .SendRequest<GetAccountPublicKeysRequest, IEnumerable<string>>
                 (RemmeMethodsEnum.GetAccountPublicKeysList,
-                 new GetAccountPublicKeysRequest { PublicKey = accountPublicKey });
+                    new GetAccountPublicKeysRequest { PublicKeyAddress = userAccountAddress });
         }
 
         public AsymmetricCipherKeyPair GenerateRsaKeyPair(int rsaKeySize = 2048)
