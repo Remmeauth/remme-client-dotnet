@@ -5,9 +5,6 @@ REMME .NET Client
 
 **An open source .NET integration library for REMChain, simplifying the access and interaction with REMME nodes both public or permissioned.**
 
-**NOTE**: Consider using **0.2.*** library version if you communicate with REMME node via REST API (current REMME testnet), 
-If you communicate with REMME node via JSON RPC consider using **0.3.*** library version (if you build node locally from the source code)
-
 How to use
 ----------
 1. Install and run REMME node with required REST API methods  enabled. 
