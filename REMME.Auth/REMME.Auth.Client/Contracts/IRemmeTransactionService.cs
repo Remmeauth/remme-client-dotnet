@@ -3,6 +3,7 @@ using REMME.Auth.Client.Contracts.Models;
 using REMME.Auth.Client.RemmeApi.Models.Proto;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using REMME.Auth.Client.RemmeApi.Models;
 
 namespace REMME.Auth.Client.Contracts
 {
@@ -22,5 +23,7 @@ namespace REMME.Auth.Client.Contracts
         List<string> GetDataInputOutput(string dataAddress);
 
         TransactionPayload GetTransactionPayload(IMessage payload, uint methodNumber);
+
+        Task<NodeConfigResponse> GetNodeConfig();
     }
 }

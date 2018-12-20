@@ -27,8 +27,8 @@ namespace REMME.Auth.Client.Implementation
 
         public async Task<Transaction> CreateTransaction(TransactionCreateDto toCreate)
         {
-            var bathcerPublicKey = await GetBatcherPublicKey();
-            var header = ComputeHeader(toCreate, bathcerPublicKey);
+            var bathcerPublicKey = await GetNodeConfig();
+            var header = ComputeHeader(toCreate, bathcerPublicKey.NodePublicKey);
 
             return new Transaction
             {
@@ -77,6 +77,11 @@ namespace REMME.Auth.Client.Implementation
                 Data = payload.ToByteString()
             };
         }
+        
+        public async Task<NodeConfigResponse> GetNodeConfig()
+        {
+            return await _remmeRest.SendRequest<NodeConfigResponse>(RemmeMethodsEnum.GetNodeConfig);
+        }
 
         #region Private Helpers 
 
@@ -103,12 +108,6 @@ namespace REMME.Auth.Client.Implementation
         private string GetNonce()
         {
             return Guid.NewGuid().ToByteArray().BytesToHexString();
-        }
-
-        private async Task<string> GetBatcherPublicKey()
-        {
-            return (await _remmeRest.SendRequest<NodeConfigResponse>(RemmeMethodsEnum.GetNodeConfig))
-                .NodePublicKey;
         }
 
         #endregion

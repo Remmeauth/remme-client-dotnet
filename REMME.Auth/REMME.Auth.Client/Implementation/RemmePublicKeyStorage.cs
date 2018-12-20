@@ -36,10 +36,13 @@ namespace REMME.Auth.Client.Implementation
             var storePayload = GenarateStorePayload(publicKeyDto);
             var remmeTransaction = _remmeTransactionService.GetTransactionPayload(storePayload, 0);
 
+            var nodeStoragePublicKey  = (await _remmeTransactionService.GetNodeConfig()).StoragePublicKey;
             var pubKeyAddress = REMChainUtils.GetAddressFromData(publicKeyDto.KeyPair.GetPublicKeyPem(), FAMILY_NAME);
+            
             var inputsOutputs = _remmeTransactionService.GetDataInputOutput(pubKeyAddress);
             inputsOutputs.Add(REMChainUtils.GetSettingsAddressFromData("remme.economy_enabled"));
             inputsOutputs.Add(REMChainUtils.GetSettingsAddressFromData("remme.settings.storage_pub_key"));
+            inputsOutputs.Add(REMChainUtils.GetAddressFromData(nodeStoragePublicKey, RemmeAccount.ACCOUNT_FAMILY_NAME));
 
             var transactionDto = _remmeTransactionService.GenerateTransactionDto(
                                                                 remmeTransaction,
