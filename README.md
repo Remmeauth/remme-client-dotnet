@@ -17,6 +17,8 @@ PM > Install-Package REMME.Auth.Client
 
 3. Run methods of **RemmeClient** class to interract with REMME node. 
 
+***Note: you may use one of Example console projects from this repo, to start playing with integration library.***
+
 Examples
 ------------
 #### Account management
@@ -41,7 +43,8 @@ var client = new RemmeClient(privateKeyHex, networkConfig);
 ```
 
 #### Tokens
-```csharp    
+```csharp  
+var newRemmeAccount = new RemmeAccount();  
 var someRemmePublicKey = newRemmeAccount.PublicKeyHex;
 var balance = await client.Token.GetBalance(someRemmePublicKey);
 
@@ -64,7 +67,7 @@ transactionResult.ConnectToWebSocket();
 #### Certificates/Public keys
 ```csharp
 var userKeys = await client.PublicKeyStorage
-                           .GetUserStoredPublicKeys(client.Account.PublicKeyHex);
+                           .GetAccountStoredPublicKeys(client.Account.PublicKeyHex);
 
 var certificateTransactioResult = await client.Certificate
                                               .CreateAndStore(
