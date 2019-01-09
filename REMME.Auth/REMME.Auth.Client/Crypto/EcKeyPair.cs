@@ -7,6 +7,7 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
 using REMME.Auth.Client.Implementation.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace REMME.Auth.Client.Crypto
@@ -93,21 +94,37 @@ namespace REMME.Auth.Client.Crypto
             signer.SetPrivateKey(privKey);
             var sig = ECDSASignature.FromDER(signer.Sign(input)).ToCanonical();
            
-            byte[] result = new byte[64];
+            var r_arr = sig.R.ToByteArrayUnsigned();
+            var s_arr = sig.S.ToByteArrayUnsigned();
             
-            Array.Copy(sig.R.ToByteArrayUnsigned(), 0, result, 0, 32);
-            Array.Copy(sig.S.ToByteArrayUnsigned(), 0, result, 32, 32);
+            var rsigPad = new byte[32];
+            Array.Copy(r_arr, 0, rsigPad, rsigPad.Length - r_arr.Length, r_arr.Length);
 
-            return result;
+            var ssigPad = new byte[32];
+            Array.Copy(s_arr, 0, ssigPad, ssigPad.Length - s_arr.Length, s_arr.Length);
+                
+            return MergeByteArrays(rsigPad, ssigPad);
         }
 
         #region Helpers
 
         private byte[] PrivateKeyToBytes()
         {
-            return _privateKey.ToByteArray();
+            return _privateKey.ToByteArrayUnsigned();
         }
 
+        private static byte[] MergeByteArrays(params byte[][] arrays)
+        {
+            return MergeToEnum(arrays).ToArray();
+        }
+        
+        private static IEnumerable<byte> MergeToEnum(params byte[][] arrays)
+        {
+            foreach (var a in arrays)
+            foreach (var b in a)
+                yield return b;
+        }
+        
         #endregion
 
         #region Static Members
